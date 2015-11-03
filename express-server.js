@@ -31,8 +31,7 @@ app.get('/ninja/:ninjaid/unavailable', function (req, res) {
   nJ.markNinjaUnavailable(req.params.ninjaid, function(result){res.status(200).send(result)})
 });
 
-app.get('/job/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', function (req, res) {
-  
+app.get('/job/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', function (req, res) {  
   aSync.waterfall([    
     function(callback){      
       var key = "ninja:job:" + req.params.requester_id + ":" + shortid.generate();
@@ -42,13 +41,18 @@ app.get('/job/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', fu
       nJ.findNinjaForJob(jobkey, req.params.requester_id,req.params.pickup_latd, req.params.pickup_lngd,req.params.drop_latd, req.params.drop_lngd,function(result){})
       jobs.updateJobStatus(jobkey,'Ninja Found');
       callback(null,jobkey);
-    }, function(jobkey, callback){
-      nJ.requestPickup(jobkey)
-      jobs.updateJobStatus(jobkey,'Pickup Requested')                 
-      res.status(200).send(jobkey);      
+    }, function(jobkey, callback){      
+        nJ.requestPickup(jobkey);
+        jobs.updateJobStatus(jobkey,'Pickup Requested')                 
+        res.status(200).send(jobkey);            
     }        
-  ])
-  
+  ])  
+});
+
+app.get('/job/:requester_id/:jobid/reject', function (req, res) {  
+  var key = "ninja:job:" + req.params.requester_id + ":" + req.params.jobid
+  nJ.rejectJob(key)
+  res.send('Rejecting Job!');
 });
 
 app.get('/nearby/:pickup_latd/:pickup_lngd', function (req, res) {  

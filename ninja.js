@@ -9,7 +9,7 @@ var level = require("level-browserify");
 var levelgraph = require("levelgraph");
 var db = levelgraph(level("postcodes"));
 var geoLib = require('geolib');
-
+var jobs = require('./jobs.js');
 
 exports.getAllAvailableGrids = function(callback){
   rediscli.keys("ninja:available:*",function(err,list){callback(list)})
@@ -75,17 +75,22 @@ exports.findNinjaForJob = function(jobkey, requester, pickup_latd, pickup_lngd, 
       gridToNinjaLocations(grid, callback);
     },function(gridNinjas,callback){     
       locationPoints(true,pickup_latd,pickup_lngd,gridNinjas,callback);
-    },function(points, callback){
+    },function(points, callback){      
       var list = geoLib.orderByDistance(points['self'],points)
-      var key = jobkey + ":ninja:current";
-      rediscli.set(key,list[1]['key']);      
       var key = jobkey + ":ninja";
-      var arr = [];
+      var arr = [];      
       list.forEach(function(ninja){
-        arr.push(ninja['key'])
+        if(ninja['key'] != 'self')
+          arr.push(ninja['key'])
       })
-      rediscli.sadd(key,arr);      
-      finalCallback(list)
+      rediscli.rpush(key,arr, function(err, res){
+        rediscli.lpop(key, function(err, res){
+          var key2 = jobkey + ":ninja:current";
+          rediscli.set(key2,res, function(err, res){
+            finalCallback(list)
+          });              
+        });      
+      });          
     }
   ]);
 }
@@ -107,13 +112,22 @@ exports.findNinjaNearby = function(pickup_latd,pickup_lngd, finalCallback){
 }
 
 exports.requestPickup = function(jobkey){ 
-  //this function needs to sendout a GCM Message  
-  console.log('Requesting Pickup!', jobkey);
+  //this function needs to sendout a GCM Message    
+  var key = jobkey +":ninja:current"
+  rediscli.get(key, function(err,result){
+    console.log('Requesting Pickup for: ' + jobkey + ': from :' + result);  
+  })
+  
 }
 
 exports.rejectJob = function(jobkey){  
-  rediscli.get(jobkey + ":ninja", function(err,result){
-    exports.updateJobStatus(jobkey,"Pickup Rejected");    
+  rediscli.get(jobkey + ":ninja:current", function(err,result){
+    jobs.updateJobStatus(jobkey,"Pickup Rejected");
+    rediscli.lpop(jobkey+":ninja", function(err,res){
+      rediscli.set(jobkey + ":ninja:current",res,function(err,result){
+        exports.requestPickup(jobkey)
+      })
+    })
   })
 }
 
@@ -127,7 +141,6 @@ function reverseGeocode(pickup_latd, pickup_lngd, callback){
 }
 
 function postcodeToGrid(postcode,callback){
-  console.log(postcode);
   db.get({subject:postcode,predicate:'grid'},function(err,list){
     callback(null,list[0].object);
   });
