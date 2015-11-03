@@ -11,15 +11,15 @@ var db = levelgraph(level("postcodes"));
 var geoLib = require('geolib');
 
 
-exports.findAvailable = function(callback){
+exports.getAllAvailableGrids = function(callback){
   rediscli.keys("ninja:available:*",function(err,list){callback(list)})
 };
 
-exports.findAvailableGrid = function(grid,callback){  
+exports.getAvailableGrid = function(grid,callback){  
   rediscli.smembers("ninja:available:" + grid,function(err,list){callback(list)})
 };
 
-exports.findNinjaInfo = function(ninjaid, callback){
+exports.getNinjaInfo = function(ninjaid, callback){
   var key1 = "ninja:"+ ninjaid +":status";
   var key2 = "ninja:"+ ninjaid +":location";
   var key3 = "ninja:"+ ninjaid +":grid";
@@ -41,18 +41,12 @@ exports.markNinjaUnavailable = function(ninjaid, callback){
   }); 
 };
 
-exports.markAvailable = function(ninjaid,latd,lngd,finalCallback){  
+exports.markNinjaAvailable = function(ninjaid,latd,lngd,finalCallback){  
   aSync.waterfall([
     function(callback){
-      geocoder.reverseGeocode( latd, lngd, function ( err, data ) {
-        var list1 = _.find(data.results, function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
-        var list2 = _.find(list1.address_components,function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
-        callback(null,list2.long_name);
-      });
+      reverseGeocode(pickup_latd, pickup_lngd, callback)
     }, function(postcode,callback){
-        db.get({subject:postcode,predicate:'grid'},function(err,list){
-          callback(null,list[0].object);  
-        })
+      postcodeToGrid(postcode,callback)
     }, function(grid,callback){
       var key = "ninja:available:" + grid;
       var value = "ninja:"+ ninjaid +":location"
@@ -74,36 +68,70 @@ exports.markAvailable = function(ninjaid,latd,lngd,finalCallback){
 exports.findNinjaForJob = function(pickup_latd, pickup_lngd, drop_latd, drop_lngd, finalCallback){  
   aSync.waterfall([    
     function(callback){
-      geocoder.reverseGeocode( pickup_latd, pickup_lngd, function ( err, data ) {
-        var list1 = _.find(data.results, function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
-        var list2 = _.find(list1.address_components,function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
-        callback(null,list2.long_name);});      
+      reverseGeocode(pickup_latd, pickup_lngd, callback)  
     }, function(postcode,callback){
-        db.get({subject:postcode,predicate:'grid'},function(err,list){
-          callback(null,list[0].object);});
+      postcodeToGrid(postcode,callback)
     }, function(grid,callback){
-        var key = "ninja:available:" + grid;
-        rediscli.smembers(key,function(err,list){
-          rediscli.mget(list,function(err,list){
-            callback(null,list)
-          });
-        });
+      gridToNinjaLocations(grid, callback);
     },function(gridNinjas,callback){     
-      var points = {}
-      var pickup = {}
-      pickup['latitude'] = pickup_latd;
-      pickup['longitude'] = pickup_lngd;
-      points['pickup'] = pickup;
-      gridNinjas.forEach(function(ninja){
-        var arr = ninja.split(":")
-        var loc = {}
-        loc['latitude'] = arr[1]
-        loc['longitude'] = arr[2]
-        points[arr[0]] = loc;
-      });
-      callback(null,points)      
+      locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback);
     },function(points, callback){
       finalCallback(geoLib.findNearest(points['pickup'],points,1));
     }
   ]);
+}
+
+exports.findNinjaNearby = function(pickup_latd,pickup_lngd, finalCallback){
+  aSync.waterfall([    
+    function(callback){
+      reverseGeocode(pickup_latd, pickup_lngd, callback);
+    }, function(postcode,callback){      
+      postcodeToGrid(postcode,callback);
+    }, function(grid,callback){      
+      gridToNinjaLocations(grid, callback);
+    },function(gridNinjas,callback){           
+      locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback);
+    },function(points, callback){
+      finalCallback(points);
+    }
+  ]);
+}
+
+function reverseGeocode(pickup_latd, pickup_lngd, callback){
+  geocoder.reverseGeocode( pickup_latd, pickup_lngd, function ( err, data ) {
+    var list1 = _.find(data.results, function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
+    var list2 = _.find(list1.address_components,function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
+    callback(null,list2.long_name);
+  });        
+}
+
+function postcodeToGrid(postcode,callback){
+  db.get({subject:postcode,predicate:'grid'},function(err,list){
+    callback(null,list[0].object);
+  });
+}
+
+function gridToNinjaLocations(grid,callback){
+  var key = "ninja:available:" + grid;
+  rediscli.smembers(key,function(err,list){
+    rediscli.mget(list,function(err,list){
+      callback(null,list)
+    });
+  });  
+}
+
+function locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback){
+  var points = {}
+  var pickup = {}
+  pickup['latitude'] = pickup_latd;
+  pickup['longitude'] = pickup_lngd;
+  points['pickup'] = pickup;
+  gridNinjas.forEach(function(ninja){
+    var arr = ninja.split(":")
+    var loc = {}
+    loc['latitude'] = arr[1]
+    loc['longitude'] = arr[2]
+    points[arr[0]] = loc;
+  });  
+  callback(null,points);
 }
