@@ -44,7 +44,7 @@ exports.markNinjaUnavailable = function(ninjaid, callback){
 exports.markNinjaAvailable = function(ninjaid,latd,lngd,finalCallback){  
   aSync.waterfall([
     function(callback){
-      reverseGeocode(pickup_latd, pickup_lngd, callback)
+      reverseGeocode(latd, lngd, callback)
     }, function(postcode,callback){
       postcodeToGrid(postcode,callback)
     }, function(grid,callback){
@@ -74,11 +74,17 @@ exports.findNinjaForJob = function(jobkey, requester, pickup_latd, pickup_lngd, 
     }, function(grid,callback){
       gridToNinjaLocations(grid, callback);
     },function(gridNinjas,callback){     
-      locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback);
+      locationPoints(true,pickup_latd,pickup_lngd,gridNinjas,callback);
     },function(points, callback){
-      var list = geoLib.findNearest(points['pickup'],points,1);
+      var list = geoLib.orderByDistance(points['self'],points)
+      var key = jobkey + ":ninja:current";
+      rediscli.set(key,list[1]['key']);      
       var key = jobkey + ":ninja";
-      rediscli.set(key,list['key'])
+      var arr = [];
+      list.forEach(function(ninja){
+        arr.push(ninja['key'])
+      })
+      rediscli.sadd(key,arr);      
       finalCallback(list)
     }
   ]);
@@ -101,9 +107,14 @@ exports.findNinjaNearby = function(pickup_latd,pickup_lngd, finalCallback){
 }
 
 exports.requestPickup = function(jobkey){ 
-
+  //this function needs to sendout a GCM Message  
   console.log('Requesting Pickup!', jobkey);
+}
 
+exports.rejectJob = function(jobkey){  
+  rediscli.get(jobkey + ":ninja", function(err,result){
+    exports.updateJobStatus(jobkey,"Pickup Rejected");    
+  })
 }
 
 
@@ -116,6 +127,7 @@ function reverseGeocode(pickup_latd, pickup_lngd, callback){
 }
 
 function postcodeToGrid(postcode,callback){
+  console.log(postcode);
   db.get({subject:postcode,predicate:'grid'},function(err,list){
     callback(null,list[0].object);
   });
@@ -130,12 +142,14 @@ function gridToNinjaLocations(grid,callback){
   });  
 }
 
-function locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback){
+function locationPoints(includeSelf, pickup_latd,pickup_lngd,gridNinjas,callback){
   var points = {}
-  var pickup = {}
-  pickup['latitude'] = pickup_latd;
-  pickup['longitude'] = pickup_lngd;
-  points['pickup'] = pickup;
+  if(includeSelf){
+    var pickup = {}
+    pickup['latitude'] = pickup_latd;
+    pickup['longitude'] = pickup_lngd;
+    points['self'] = pickup;
+  }
   gridNinjas.forEach(function(ninja){
     var arr = ninja.split(":")
     var loc = {}

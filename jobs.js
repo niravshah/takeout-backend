@@ -21,8 +21,12 @@ exports.getJobInfo = function(requester_id, jobid, callback){
   var key = "ninja:job:" + requester_id + ":" + jobid;
   var key1 = "ninja:job:" + requester_id + ":" + jobid + ":status";
   var key2 = "ninja:job:" + requester_id + ":" + jobid + ":ninja";
-  rediscli.mget([key,key1,key2],function(err, response){
-    callback(response)
+  var key3 = key2 + ":current"
+  rediscli.mget([key,key1,key3],function(err, response){    
+    rediscli.smembers(key2,function(err,result){
+      var arr = response.concat(result);
+      callback(arr)
+    })
   })
 }
 
