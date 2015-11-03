@@ -8,14 +8,40 @@ var aSync = require('async');
 var level = require("level-browserify");
 var levelgraph = require("levelgraph");
 var db = levelgraph(level("postcodes"));
+var geoLib = require('geolib');
 
 
 exports.findAvailable = function(callback){
   rediscli.keys("ninja:available:*",function(err,list){callback(list)})
 };
 
-exports.markAvailable = function(ninjaid,latd,lngd,finalCallback){
-  
+exports.findAvailableGrid = function(grid,callback){  
+  rediscli.smembers("ninja:available:" + grid,function(err,list){callback(list)})
+};
+
+exports.findNinjaInfo = function(ninjaid, callback){
+  var key1 = "ninja:"+ ninjaid +":status";
+  var key2 = "ninja:"+ ninjaid +":location";
+  var key3 = "ninja:"+ ninjaid +":grid";
+  rediscli.mget([key1, key2, key3],function(err, list){callback(list)})  
+};
+
+exports.markNinjaUnavailable = function(ninjaid, callback){  
+  var key1 = "ninja:"+ ninjaid +":status";
+  var val1 = "unavailable";
+  rediscli.set(key1,val1)
+  var key2 = "ninja:"+ ninjaid +":grid";
+  rediscli.get(key2,function(err, grid){
+    var key3 = "ninja:available:" + grid;
+    var val3 = "ninja:"+ ninjaid +":location"
+    rediscli.srem(key3,val3,function(err,res){
+      if(err) callback('Error')
+      else callback('Ninja marked Unavailable')      
+    })
+  }); 
+};
+
+exports.markAvailable = function(ninjaid,latd,lngd,finalCallback){  
   aSync.waterfall([
     function(callback){
       geocoder.reverseGeocode( latd, lngd, function ( err, data ) {
@@ -30,19 +56,54 @@ exports.markAvailable = function(ninjaid,latd,lngd,finalCallback){
     }, function(grid,callback){
       var key = "ninja:available:" + grid;
       var value = "ninja:"+ ninjaid +":location"
-      rediscli.sadd(key,value);
-      
+      rediscli.sadd(key,value);      
       var key2 = "ninja:"+ ninjaid +":status";
       var val2 = "available";
       var key3 = "ninja:"+ ninjaid +":location";
       var val3 = ninjaid + ":" + latd + ":" + lngd;
-      
+      var key4 = "ninja:"+ ninjaid +":grid";
+      var val4 = grid;      
       rediscli.set(key2, val2);
       rediscli.set(key3, val3);
+      rediscli.set(key4, val4);      
       finalCallback(key);
-      
     }
   ]);        
+};
 
+exports.findNinjaForJob = function(pickup_latd, pickup_lngd, drop_latd, drop_lngd, finalCallback){  
+  aSync.waterfall([    
+    function(callback){
+      geocoder.reverseGeocode( pickup_latd, pickup_lngd, function ( err, data ) {
+        var list1 = _.find(data.results, function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
+        var list2 = _.find(list1.address_components,function(dt){if (_.indexOf(dt.types,'postal_code') > -1) return true});
+        callback(null,list2.long_name);});      
+    }, function(postcode,callback){
+        db.get({subject:postcode,predicate:'grid'},function(err,list){
+          callback(null,list[0].object);});
+    }, function(grid,callback){
+        var key = "ninja:available:" + grid;
+        rediscli.smembers(key,function(err,list){
+          rediscli.mget(list,function(err,list){
+            callback(null,list)
+          });
+        });
+    },function(gridNinjas,callback){     
+      var points = {}
+      var pickup = {}
+      pickup['latitude'] = pickup_latd;
+      pickup['longitude'] = pickup_lngd;
+      points['pickup'] = pickup;
+      gridNinjas.forEach(function(ninja){
+        var arr = ninja.split(":")
+        var loc = {}
+        loc['latitude'] = arr[1]
+        loc['longitude'] = arr[2]
+        points[arr[0]] = loc;
+      });
+      callback(null,points)      
+    },function(points, callback){
+      finalCallback(geoLib.findNearest(points['pickup'],points,1));
+    }
+  ]);
 }
-
