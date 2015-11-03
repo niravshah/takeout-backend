@@ -65,7 +65,7 @@ exports.markNinjaAvailable = function(ninjaid,latd,lngd,finalCallback){
   ]);        
 };
 
-exports.findNinjaForJob = function(pickup_latd, pickup_lngd, drop_latd, drop_lngd, finalCallback){  
+exports.findNinjaForJob = function(jobkey, requester, pickup_latd, pickup_lngd, drop_latd, drop_lngd, finalCallback){  
   aSync.waterfall([    
     function(callback){
       reverseGeocode(pickup_latd, pickup_lngd, callback)  
@@ -76,7 +76,10 @@ exports.findNinjaForJob = function(pickup_latd, pickup_lngd, drop_latd, drop_lng
     },function(gridNinjas,callback){     
       locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback);
     },function(points, callback){
-      finalCallback(geoLib.findNearest(points['pickup'],points,1));
+      var list = geoLib.findNearest(points['pickup'],points,1);
+      var key = jobkey + ":ninja";
+      rediscli.set(key,list['key'])
+      finalCallback(list)
     }
   ]);
 }
@@ -96,6 +99,13 @@ exports.findNinjaNearby = function(pickup_latd,pickup_lngd, finalCallback){
     }
   ]);
 }
+
+exports.requestPickup = function(jobkey){ 
+
+  console.log('Requesting Pickup!', jobkey);
+
+}
+
 
 function reverseGeocode(pickup_latd, pickup_lngd, callback){
   geocoder.reverseGeocode( pickup_latd, pickup_lngd, function ( err, data ) {
@@ -135,3 +145,4 @@ function locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback){
   });  
   callback(null,points);
 }
+
