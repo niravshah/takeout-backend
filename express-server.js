@@ -4,12 +4,37 @@ var express = require('express');
 var app = express();
 var aSync = require('async');
 var shortid = require('shortid');
+var bodyParser = require('body-parser')
+var superagent = require('superagent')
+
+app.use(bodyParser.json());
 
 var server = app.listen(3000, function () {
   var host = server.address().address;
   var port = server.address().port;
   console.log('Example app listening at http://%s:%s', host, port);
 });
+
+app.post('/demandnow/login',function(req,res){
+  
+  console.log(req.body);
+  
+  superagent
+    .get("https://www.googleapis.com/oauth2/v3/tokeninfo")
+    .query({id_token:req.body.idToken})
+    .end(function(err,resp){
+      
+      if(err){
+        console.log('Error:', error);
+        res.status(500).send('Error')
+      }
+      console.log(resp.body)  
+      res.status(200).send(resp.body)
+  })
+  
+  
+  
+})
 
 app.get('/available', function (req, res) {
   nJ.getAllAvailableGrids(function(result){res.status(200).send(result)})
