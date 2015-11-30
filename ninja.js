@@ -1,7 +1,14 @@
 var exports = module.exports = {};
 
-var redis = require("redis"),
-    rediscli = redis.createClient();
+var redis = require("redis");
+var bluebird = require("bluebird");
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
+
+var rediscli = redis.createClient();
+
+
+
 var geocoder = require('geocoder');
 var _ = require('underscore');
 var aSync = require('async');
@@ -11,34 +18,33 @@ var db = levelgraph(level("postcodes"));
 var geoLib = require('geolib');
 var jobs = require('./jobs.js');
 
-exports.getAllAvailableGrids = function(callback){
-  rediscli.keys("ninja:available:*",function(err,list){callback(list)})
+exports.getAllAvailableGrids = function(){  
+  return rediscli.keysAsync("ninja:available:*");
 };
 
-exports.getAvailableGrid = function(grid,callback){  
-  rediscli.smembers("ninja:available:" + grid,function(err,list){callback(list)})
+exports.getAvailableGrid = function(grid){  
+  return rediscli.smembersAsync("ninja:available:" + grid);
 };
 
-exports.getNinjaInfo = function(ninjaid, callback){
+exports.getNinjaInfo = function(ninjaid){
   var key1 = "ninja:"+ ninjaid +":status";
   var key2 = "ninja:"+ ninjaid +":location";
   var key3 = "ninja:"+ ninjaid +":grid";
-  rediscli.mget([key1, key2, key3],function(err, list){callback(list)})  
+  return rediscli.mgetAsync([key1, key2, key3])  
 };
 
 exports.markNinjaUnavailable = function(ninjaid, callback){  
   var key1 = "ninja:"+ ninjaid +":status";
   var val1 = "unavailable";
-  rediscli.set(key1,val1)
+  rediscli.set(key1,val1);
   var key2 = "ninja:"+ ninjaid +":grid";
-  rediscli.get(key2,function(err, grid){
+  return rediscli.getAsync(key2).then(function(grid){    
+    console.log('Arg to Then Function', grid);
     var key3 = "ninja:available:" + grid;
-    var val3 = "ninja:"+ ninjaid +":location"
-    rediscli.srem(key3,val3,function(err,res){
-      if(err) callback('Error')
-      else callback('Ninja marked Unavailable')      
-    })
-  }); 
+    var val3 = "ninja:"+ ninjaid +":location"        
+    return rediscli.sremAsync(key3,val3)
+  })   
+  
 };
 
 exports.markNinjaAvailable = function(ninjaid,latd,lngd,finalCallback){  

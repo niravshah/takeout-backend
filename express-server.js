@@ -6,6 +6,7 @@ var aSync = require('async');
 var shortid = require('shortid');
 var bodyParser = require('body-parser')
 var superagent = require('superagent')
+var Q = require('q');
 
 app.use(bodyParser.json());
 
@@ -15,10 +16,8 @@ var server = app.listen(3000, function () {
   console.log('Example app listening at http://%s:%s', host, port);
 });
 
-app.post('/demandnow/login',function(req,res){
-  
-  console.log(req.body);
-  
+app.post('/demandnow/login',function(req,res){  
+  console.log(req.body);  
   superagent
     .get("https://www.googleapis.com/oauth2/v3/tokeninfo")
     .query({id_token:req.body.idToken})
@@ -31,21 +30,18 @@ app.post('/demandnow/login',function(req,res){
       console.log(resp.body)  
       res.status(200).send(resp.body)
   })
-  
-  
-  
 })
 
-app.get('/available', function (req, res) {
-  nJ.getAllAvailableGrids(function(result){res.status(200).send(result)})
+app.get('/available', function (req, res) {  
+  nJ.getAllAvailableGrids().then(function(val){res.status(200).send(val)});  
 });
 
 app.get('/available/:grid', function (req, res) {
-  nJ.getAvailableGrid(req.params.grid, function(result){res.status(200).send(result)})
+  nJ.getAvailableGrid(req.params.grid).then(function(result){res.status(200).send(result)})
 });
 
 app.get('/ninja/:ninjaid', function (req, res) {
-  nJ.getNinjaInfo(req.params.ninjaid, function(result){res.status(200).send(result)})
+  nJ.getNinjaInfo(req.params.ninjaid).then(function(result){res.status(200).send(result)});
 });
 
 app.get('/ninja/:ninjaid/available/:latd/:lngd', function (req, res) {
@@ -53,7 +49,7 @@ app.get('/ninja/:ninjaid/available/:latd/:lngd', function (req, res) {
 });
 
 app.get('/ninja/:ninjaid/unavailable', function (req, res) {
-  nJ.markNinjaUnavailable(req.params.ninjaid, function(result){res.status(200).send(result)})
+  nJ.markNinjaUnavailable(req.params.ninjaid).then(function(result){res.sendStatus(result)});
 });
 
 app.get('/job/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', function (req, res) {  

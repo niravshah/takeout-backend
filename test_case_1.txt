@@ -1,0 +1,8 @@
+http://morph-stadium.codio.io:3000/available
+
+http://morph-stadium.codio.io:3000/ninja/tom/available/51.595168/-0.249885
+http://morph-stadium.codio.io:3000/ninja/alfred/available/51.595208/-0.251033
+http://morph-stadium.codio.io:3000/ninja/gina/available/51.594948/-0.252321
+http://morph-stadium.codio.io:3000/ninja/ted/available/51.592009/-0.259359
+
+http://morph-stadium.codio.io:3000/available/TQ2189
