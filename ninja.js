@@ -103,10 +103,8 @@ exports.findNinjaNearby = function(pickup_latd,pickup_lngd, finalCallback){
       postcodeToGrid(postcode,callback);
     }, function(grid,callback){      
       gridToNinjaLocations(grid, callback);
-    },function(gridNinjas,callback){           
-      locationPoints(pickup_latd,pickup_lngd,gridNinjas,callback);
-    },function(points, callback){
-      finalCallback(points);
+    },function(gridNinjas,callback){   
+      locationPoints(false,pickup_latd,pickup_lngd,gridNinjas,finalCallback);
     }
   ]);
 }
@@ -163,13 +161,25 @@ function locationPoints(includeSelf, pickup_latd,pickup_lngd,gridNinjas,callback
     pickup['longitude'] = pickup_lngd;
     points['self'] = pickup;
   }
-  gridNinjas.forEach(function(ninja){
+  console.log(gridNinjas);
+  _(gridNinjas).each(function(ninja,key){
+    console.log(ninja)
     var arr = ninja.split(":")
     var loc = {}
     loc['latitude'] = arr[1]
     loc['longitude'] = arr[2]
     points[arr[0]] = loc;
-  });  
-  callback(null,points);
+    
+  });
+  console.log(points);
+  console.log(callback)
+  /*gridNinjas.forEach(function(ninja){
+    var arr = ninja.split(":")
+    var loc = {}
+    loc['latitude'] = arr[1]
+    loc['longitude'] = arr[2]
+    points[arr[0]] = loc;
+  });*/  
+  callback(points);
 }
 
