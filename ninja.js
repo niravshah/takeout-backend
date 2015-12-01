@@ -167,25 +167,16 @@ function locationPoints(includeSelf, pickup_latd,pickup_lngd,gridNinjas,callback
     pickup['longitude'] = pickup_lngd;
     points['self'] = pickup;
   }
-  console.log(gridNinjas);
+  //console.log(gridNinjas);
   _(gridNinjas).each(function(ninja,key){
-    console.log(ninja)
+    //console.log(ninja)
     var arr = ninja.split(":")
     var loc = {}
     loc['latitude'] = arr[1]
     loc['longitude'] = arr[2]
     points[arr[0]] = loc;
-    
   });
-  console.log(points);
-  console.log(callback)
-  /*gridNinjas.forEach(function(ninja){
-    var arr = ninja.split(":")
-    var loc = {}
-    loc['latitude'] = arr[1]
-    loc['longitude'] = arr[2]
-    points[arr[0]] = loc;
-  });*/  
+  //console.log(points);
   callback(points);
 }
 

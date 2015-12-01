@@ -7,6 +7,7 @@ var shortid = require('shortid');
 var bodyParser = require('body-parser')
 var superagent = require('superagent')
 var Q = require('q');
+var google_client_id="1054636785796-j4ekc1r25nlmq0ut4fgehdqbi3i1o1on.apps.googleusercontent.com"
 
 app.use(bodyParser.json());
 
@@ -16,8 +17,13 @@ var server = app.listen(3000, function () {
   console.log('Example app listening at http://%s:%s', host, port);
 });
 
+app.post('/demandnow/gcm',function(req,res){  
+  console.log(req.body)
+  res.status(200).send(req.body)
+});
+
 app.post('/demandnow/login',function(req,res){  
-  console.log(req.body);  
+  //console.log(req.body);  
   superagent
     .get("https://www.googleapis.com/oauth2/v3/tokeninfo")
     .query({id_token:req.body.idToken})
@@ -27,7 +33,10 @@ app.post('/demandnow/login',function(req,res){
         console.log('Error:', error);
         res.status(500).send('Error')
       }
-      console.log(resp.body)  
+      
+      if(resp.body.aud == google_client_id){
+        console.log("Google User Id", resp.body.sub)  
+      }
       res.status(200).send(resp.body)
   })
 })
@@ -77,6 +86,7 @@ app.get('/job/:requester_id/:jobid/reject', function (req, res) {
 });
 
 app.get('/nearby/:pickup_latd/:pickup_lngd', function (req, res) {  
+  //console.log("findNinjaNearby",req.params.pickup_latd, req.params.pickup_lngd)
   nJ.findNinjaNearby(req.params.pickup_latd, req.params.pickup_lngd, function(result){res.status(200).send(result)})
 });
 

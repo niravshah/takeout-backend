@@ -1,0 +1,6 @@
+Example app listening at http://0.0.0.0:3000                                                                                                  
+Google User Id 111465732657945524910                                                                                                          
+{ token: 'cYYzx2FBxcE:APA91bH2uw1a8BlMN7okG9zeDtOxFUIN5T1z7PYvpD7zWka6EVfYcUa1e1nNt_OU2iKe07mi11QSiU9Go2TUEfbfuVUn5CUXeLaSQi03J_VIbHSMGgNWhOH7
+RfzKUqs9xQsRLKLqQ2cq',                                                                                                                        
+  personEmail: 'nirav.shah83@gmail.com',                                                                                                      
+  accountId: '111465732657945524910' }  
