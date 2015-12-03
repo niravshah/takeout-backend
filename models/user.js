@@ -6,7 +6,7 @@ var userSchema = new Schema({
   personEmail:String,
   accountId:String,
   personPhoto:String,
-  gcm:String, 
+  gcm: Schema.Types.Mixed, 
   active: Boolean,
   location: String
 });

@@ -7,7 +7,7 @@ exports.sendNotification = function(gcm_id) {
   message.addNotification('message', 'Alert!!!');
   var sender = new gcm.Sender('AIzaSyDkGF_h3MydOEmWnJUcR-1pYQbOiEMFxCU');
   var registrationTokens = [];
-  registrationTokens.push('clYJUM4btSk:APA91bHRjKLaZvIKpTQeSWuqf5qXLNB4RNWivNT0HQs8TCdFdPRNnxwcVgQS2fU6uD9u-5GgW5w0zwhnfATeqlHs6pfi99QqSeHhKYbWvp2s1z3xfK-J0qneF3MEyEfJo_7fFr1lIrUa');
+  registrationTokens.push(gcm_id);
   sender.sendNoRetry(message, {
     registrationTokens: registrationTokens
   }, function(err, response) {
