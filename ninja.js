@@ -18,8 +18,8 @@ exports.getAllAvailableGrids = function(service) {
   return rediscli.keysAsync(key);
 };
 
-exports.getAvailableGrid = function(grid) {
-  return rediscli.smembersAsync("ninja:available:" + grid);
+exports.getGridNinjas = function(service, grid) {
+  return rediscli.smembersAsync("ninja:available:" + service + ":" + grid);
 };
 
 exports.getNinjaInfo = function(ninjaid) {
@@ -30,7 +30,7 @@ exports.getNinjaInfo = function(ninjaid) {
 };
 
 exports.markNinjaUnavailable = function(ninjaid, service) {
-  var key1 = "ninja:" + ninjaid + ":" + service ":status";
+  var key1 = "ninja:" + ninjaid + ":" + service + ":status";
   var val1 = "unavailable";
   rediscli.set(key1, val1);
   var key2 = "ninja:" + ninjaid + ":grid";
