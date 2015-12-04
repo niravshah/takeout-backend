@@ -1,4 +1,6 @@
-var mongoose = require('mongoose');
+//var mongoose = require('mongoose');
+var mongoose = require('mongoose-bird')();
+
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({  
@@ -8,6 +10,7 @@ var userSchema = new Schema({
   personPhoto:String,
   gcm: Schema.Types.Mixed, 
   active: Boolean,
+  new: Boolean,
   location: String
 });
 
