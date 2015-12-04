@@ -2,8 +2,8 @@ var nJ = require('./../ninja.js');
 
 module.exports = function(app){
 
-  app.get('/available', function(req, res) {
-    nJ.getAllAvailableGrids().then(function(val) {
+  app.get('/:service/available', function(req, res) {
+    nJ.getAllAvailableGrids(req.params.service).then(function(val) {
       res.status(200).send(val)
     });
   });

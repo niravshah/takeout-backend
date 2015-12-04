@@ -12,31 +12,36 @@ var levelgraph = require("levelgraph");
 var db = levelgraph(level("postcodes"));
 var geoLib = require('geolib');
 var jobs = require('./jobs.js');
-exports.getAllAvailableGrids = function() {
-  return rediscli.keysAsync("ninja:available:*");
+
+exports.getAllAvailableGrids = function(service) {  
+  var key = "ninja:available:" + service + ":*"  
+  return rediscli.keysAsync(key);
 };
+
 exports.getAvailableGrid = function(grid) {
   return rediscli.smembersAsync("ninja:available:" + grid);
 };
+
 exports.getNinjaInfo = function(ninjaid) {
-  var key1 = "ninja:" + ninjaid + ":status";
+  var key1 = "ninja:" + ninjaid + ":*" + ":status";
   var key2 = "ninja:" + ninjaid + ":location";
   var key3 = "ninja:" + ninjaid + ":grid";
   return rediscli.mgetAsync([key1, key2, key3])
 };
-exports.markNinjaUnavailable = function(ninjaid, callback) {
-  var key1 = "ninja:" + ninjaid + ":status";
+
+exports.markNinjaUnavailable = function(ninjaid, service) {
+  var key1 = "ninja:" + ninjaid + ":" + service ":status";
   var val1 = "unavailable";
   rediscli.set(key1, val1);
   var key2 = "ninja:" + ninjaid + ":grid";
   return rediscli.getAsync(key2).then(function(grid) {
-    console.log('Arg to Then Function', grid);
-    var key3 = "ninja:available:" + grid;
+    var key3 = "ninja:available:" + service + ":" +  grid;
     var val3 = "ninja:" + ninjaid + ":location"
     return rediscli.sremAsync(key3, val3)
   })
 };
-exports.markNinjaAvailable = function(ninjaid, latd, lngd, finalCallback) {
+
+exports.markNinjaAvailable = function(ninjaid, service, latd, lngd, finalCallback) {
   aSync.waterfall([
     function(callback) {
       reverseGeocode(latd, lngd, callback)
@@ -45,10 +50,10 @@ exports.markNinjaAvailable = function(ninjaid, latd, lngd, finalCallback) {
       postcodeToGrid(postcode, callback)
     },
     function(grid, callback) {
-      var key = "ninja:available:" + grid;
+      var key = "ninja:available:" + service + ":" + grid;
       var value = "ninja:" + ninjaid + ":location"
       rediscli.sadd(key, value);
-      var key2 = "ninja:" + ninjaid + ":status";
+      var key2 = "ninja:" + ninjaid + ":" + service + ":status";
       var val2 = "available";
       var key3 = "ninja:" + ninjaid + ":location";
       var val3 = ninjaid + ":" + latd + ":" + lngd;
@@ -93,7 +98,7 @@ exports.findNinjaForJob = function(jobkey, requester, pickup_latd, pickup_lngd, 
     }
   ]);
 }
-exports.findNinjaNearby = function(pickup_latd, pickup_lngd, finalCallback) {
+exports.findNinjaNearby = function(service, pickup_latd, pickup_lngd, finalCallback) {
   aSync.waterfall([
     function(callback) {
       reverseGeocode(pickup_latd, pickup_lngd, callback);
@@ -103,7 +108,7 @@ exports.findNinjaNearby = function(pickup_latd, pickup_lngd, finalCallback) {
     },
     function(grid, callback) {
       if(grid != null) {
-        gridToNinjaLocations(grid, callback);
+        gridToNinjaLocations(service, grid, callback);
       }
     },
     function(gridNinjas, callback) {
@@ -156,8 +161,8 @@ function postcodeToGrid(postcode, callback) {
   });
 }
 
-function gridToNinjaLocations(grid, callback) {
-  var key = "ninja:available:" + grid;
+function gridToNinjaLocations(service, grid, callback) {
+  var key = "ninja:available:" + service + ":" + grid;
   rediscli.smembers(key, function(err, list) {
     rediscli.mget(list, function(err, list) {
       callback(null, list)
