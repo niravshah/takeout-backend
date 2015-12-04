@@ -11,7 +11,8 @@ var userSchema = new Schema({
   gcm: Schema.Types.Mixed, 
   active: Boolean,
   new: Boolean,
-  location: String
+  location: String,
+  password: String
 });
 
 var User = mongoose.model('User', userSchema);

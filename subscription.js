@@ -8,6 +8,8 @@ mongoose.connect('mongodb://localhost/gdn');
 var redis = require("redis");
 var rediscli = redis.createClient();
 
+var bcrypt = require('bcryptjs');
+
 exports.gdnTest = function(id) {
     return gdn.get(id);
 }
@@ -36,7 +38,8 @@ exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCal
                         personPhoto: userProps.personPhoto,
                         active: true,
                         new: true,
-                        gcm: ''
+                        gcm: '',
+                        password:''
                     });
                     console.log('Saving User:', newUser)
                     newUser.saveAsync().then(function(newUsr) {
@@ -101,3 +104,21 @@ var updateGCMFromRedis = function(aId) {
 
 
 exports.updateGCMFromRedis = updateGCMFromRedis;
+
+exports.updatePassword = function(aId, password){
+    var key = "gcm:" + aId
+    rediscli.get(key, function(err, result) {
+        if(err) {
+            throw err
+        } else {
+            User.findAsync({accountId: aId}).then(function(users) {
+                if(users.length) {            
+                    var salt = bcrypt.genSaltSync(10);
+                    var hash = bcrypt.hashSync(password, salt);                    
+                    users[0].password = hash;
+                    users[0].active = true;
+                    users[0].saveAsync().then(function(res){console.log('Updated!', res)}).catch(function(err) {console.log('Error', err)});
+                }}).catch(function(err){console.log('User Find Error',err)})
+        }
+    });
+}
