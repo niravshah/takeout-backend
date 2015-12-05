@@ -8,7 +8,7 @@ module.exports = function(app){
     });
   });
 
-  app.get('/available/:service/:grid', function(req, res) {
+  app.get('/:service/available/:grid', function(req, res) {
     nJ.getGridNinjas(req.params.service, req.params.grid).then(function(result) {      
       res.status(200).send(result)
     })

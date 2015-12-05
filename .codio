@@ -3,7 +3,8 @@
 
 // Run button configuration
   "commands": {
-        "Node version": "node --version"
+        "Node version": "node --version",
+        "Start Mongo Express": "mongo-express -u user -p pass -d gdn"
   },
 
 // Preview button configuration

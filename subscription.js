@@ -29,23 +29,23 @@ exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCal
             }).then(function(user) {
                 if(user.length) {
                     console.log('Existing User:', user);
-                    resCallback(user)
+                    resCallback(user[0])
                 } else {
                     var newUser = User({
                         personName: userProps.personName,
                         personEmail: userProps.personEmail,
                         accountId: userProps.accountId,
                         personPhoto: userProps.personPhoto,
-                        active: true,
+                        active: false,
                         new: true,
                         gcm: '',
                         password:''
                     });
                     console.log('Saving User:', newUser)
                     newUser.saveAsync().then(function(newUsr) {
-                        console.log('New User:', newUsr);
+                        console.log('New User:', newUsr[0]);
                         updateGCMFromRedis(userProps.accountId)
-                        resCallback(newUsr)
+                        resCallback(newUsr[0])
                     }).
                     catch(function(err) {
                         if(err) throw err

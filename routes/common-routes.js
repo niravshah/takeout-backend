@@ -23,6 +23,13 @@ module.exports = function(app) {
     res.setHeader('Cache-Control', 'no-cache');
     res.status(200).send(req.body)
   });
+    
+  app.post('/demandnow/activate', function(req, res) {
+    console.log('Activation', req.body)
+    subscription.updatePassword(req.body.aId, req.body.password);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.status(200).send(req.body)
+  });    
   
   app.post('/demandnow/login', function(req, res) {
     console.log(req.body);
@@ -30,9 +37,8 @@ module.exports = function(app) {
     subscription.validateTokenFromGoogle(req.body.idToken, req.body, function(err) {
       res.status(500).send('Error')
     }, function(result) {
-      res.status(200).send({
-        active: true
-      })
+        console.log(JSON.stringify(result));
+      res.status(200).send(JSON.stringify(result))
     })
   });
 }

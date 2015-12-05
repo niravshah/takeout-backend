@@ -4,7 +4,7 @@ var jobs = require('./../jobs.js')
 module.exports = function(app){
 
 
-app.get('/job/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', function(req, res) {
+app.get('/job/:service/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', function(req, res) {
   aSync.waterfall([
     function(callback) {
       var key = "ninja:job:" + req.params.requester_id + ":" + shortid.generate();
@@ -12,7 +12,7 @@ app.get('/job/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', fu
       callback(null, key);
     },
     function(jobkey, callback) {
-      nJ.findNinjaForJob(jobkey, req.params.requester_id, req.params.pickup_latd, req.params.pickup_lngd, req.params.drop_latd, req.params.drop_lngd, function(result) {})
+      nJ.findNinjaForJob(jobkey, req.params.service, req.params.requester_id, req.params.pickup_latd, req.params.pickup_lngd, req.params.drop_latd, req.params.drop_lngd, function(result) {})
       jobs.updateJobStatus(jobkey, 'Ninja Found');
       callback(null, jobkey);
     },

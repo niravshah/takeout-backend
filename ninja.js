@@ -66,7 +66,7 @@ exports.markNinjaAvailable = function(ninjaid, service, latd, lngd, finalCallbac
     }
   ]);
 };
-exports.findNinjaForJob = function(jobkey, requester, pickup_latd, pickup_lngd, drop_latd, drop_lngd, finalCallback) {
+exports.findNinjaForJob = function(jobkey, service, requester, pickup_latd, pickup_lngd, drop_latd, drop_lngd, finalCallback) {
   aSync.waterfall([
     function(callback) {
       reverseGeocode(pickup_latd, pickup_lngd, callback)
@@ -75,7 +75,7 @@ exports.findNinjaForJob = function(jobkey, requester, pickup_latd, pickup_lngd, 
       postcodeToGrid(postcode, callback)
     },
     function(grid, callback) {
-      gridToNinjaLocations(grid, callback);
+      gridToNinjaLocations(service,grid, callback);
     },
     function(gridNinjas, callback) {
       locationPoints(true, pickup_latd, pickup_lngd, gridNinjas, callback);
