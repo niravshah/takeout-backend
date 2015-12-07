@@ -1,5 +1,7 @@
 var nJ = require('./../ninja.js');
-var jobs = require('./../jobs.js')
+var jobs = require('./../jobs.js');
+var aSync = require('async');
+var shortid = require('shortid');
 
 module.exports = function(app){
 
@@ -12,6 +14,7 @@ app.get('/job/:service/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_
       callback(null, key);
     },
     function(jobkey, callback) {
+      console.log(jobkey)
       nJ.findNinjaForJob(jobkey, req.params.service, req.params.requester_id, req.params.pickup_latd, req.params.pickup_lngd, req.params.drop_latd, req.params.drop_lngd, function(result) {})
       jobs.updateJobStatus(jobkey, 'Ninja Found');
       callback(null, jobkey);

@@ -72,21 +72,27 @@ exports.findNinjaForJob = function(jobkey, service, requester, pickup_latd, pick
       reverseGeocode(pickup_latd, pickup_lngd, callback)
     },
     function(postcode, callback) {
+       console.log('Postcode', postcode)
       postcodeToGrid(postcode, callback)
     },
     function(grid, callback) {
+        console.log('Grid', grid)
       gridToNinjaLocations(service,grid, callback);
     },
     function(gridNinjas, callback) {
+        console.log('gridNinjas', gridNinjas)
       locationPoints(true, pickup_latd, pickup_lngd, gridNinjas, callback);
     },
     function(points, callback) {
+      console.log('Points',points)
       var list = geoLib.orderByDistance(points['self'], points)
+      console.log('List', list);
       var key = jobkey + ":ninja";
       var arr = [];
       list.forEach(function(ninja) {
         if(ninja['key'] != 'self') arr.push(ninja['key'])
       })
+      console.log('Arr', arr)
       rediscli.rpush(key, arr, function(err, res) {
         rediscli.lpop(key, function(err, res) {
           var key2 = jobkey + ":ninja:current";
@@ -113,8 +119,10 @@ exports.findNinjaNearby = function(service, pickup_latd, pickup_lngd, finalCallb
     },
     function(gridNinjas, callback) {
       if(gridNinjas != null) {
-        locationPoints(false, pickup_latd, pickup_lngd, gridNinjas, finalCallback);
+        locationPoints(false, pickup_latd, pickup_lngd, gridNinjas, callback);
       }
+    },function(list){
+        finalCallback(list)
     }
   ]);
 }
@@ -187,6 +195,6 @@ function locationPoints(includeSelf, pickup_latd, pickup_lngd, gridNinjas, callb
     loc['longitude'] = arr[2]
     points[arr[0]] = loc;
   });
-  //console.log(points);
-  callback(points);
+  console.log(points);
+  callback(null, points);
 }
