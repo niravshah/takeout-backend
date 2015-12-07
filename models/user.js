@@ -12,7 +12,8 @@ var userSchema = new Schema({
   active: Boolean,
   new: Boolean,
   location: String,
-  password: String
+  password: String,
+  defaultService:String
 });
 
 var User = mongoose.model('User', userSchema);

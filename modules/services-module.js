@@ -17,6 +17,23 @@ exports.setAllServices = function(rC, eC) {
     catch(function(err) {
         eC(err)
     })
+    
+    var newService2 = Service({
+        serviceId: 's2',
+        serviceName: 'Window Cleaners',
+        serviceDescription: 'Our Freelancers can help you clean your storefront windows',
+        servicePhoto: 'http://www.windowcleanerslondon.co/wp-content/uploads/2015/03/window-cleaner.jpg?quality=100.3015030822570',
+        active: true,
+        new: false
+    });
+    newService2.saveAsync().then(function(result) {
+        rC(result)
+    }).
+    catch(function(err) {
+        eC(err)
+    })
+    
+    
 }
 
 exports.getAllServices = function(rC,eC) {

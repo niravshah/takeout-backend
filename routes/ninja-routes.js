@@ -22,7 +22,8 @@ module.exports = function(app){
 
   app.get('/:service/nearby/:pickup_latd/:pickup_lngd', function(req, res) {
     nJ.findNinjaNearby(req.params.service,req.params.pickup_latd, req.params.pickup_lngd, function(result) {
-      res.status(200).send(result)
+        res.setHeader('Cache-Control', 'no-cache');
+        res.status(200).send(result)
     })
   });
 

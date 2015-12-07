@@ -39,7 +39,8 @@ exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCal
                         active: false,
                         new: true,
                         gcm: '',
-                        password:''
+                        password:'',
+                        defaultService:'s1'
                     });
                     console.log('Saving User:', newUser)
                     newUser.saveAsync().then(function(newUsr) {
