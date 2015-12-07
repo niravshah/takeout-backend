@@ -13,7 +13,8 @@ var userSchema = new Schema({
   new: Boolean,
   location: String,
   password: String,
-  defaultService:String
+  defaultService:String,
+  defaultServiceName:String
 });
 
 var User = mongoose.model('User', userSchema);

@@ -40,7 +40,8 @@ exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCal
                         new: true,
                         gcm: '',
                         password:'',
-                        defaultService:'s1'
+                        defaultService:'s1',
+                        defaultServiceName:'Takeaway Delivery'
                     });
                     console.log('Saving User:', newUser)
                     newUser.saveAsync().then(function(newUsr) {
