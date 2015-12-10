@@ -1,4 +1,3 @@
-
 var exports = module.exports = {};
 var redis = require("redis");
 var bluebird = require("bluebird");
