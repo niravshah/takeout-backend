@@ -4,7 +4,7 @@ var User = require('./../models/user');
 
 module.exports = function(app) {
   
-  app.get('/demandnow/notify/:id', function(req, res) {
+  app.get('/api/notify/:id', function(req, res) {
     User.find({
       accountId: req.params.id
     }, function(err, users) {
@@ -17,21 +17,21 @@ module.exports = function(app) {
     });
   });
   
-  app.post('/demandnow/gcm', function(req, res) {
+  app.post('/api/gcm', function(req, res) {
     console.log('GCM Token', req.body)
     subscription.registerUserGCMToken(req.body.gcm, req.body.accountId, req.body.personEmail);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(200).send(req.body)
   });
     
-  app.post('/demandnow/activate', function(req, res) {
+  app.post('/api/activate', function(req, res) {
     console.log('Activation', req.body)
     subscription.updatePassword(req.body.aId, req.body.password);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(200).send(req.body)
   });    
   
-  app.post('/demandnow/login', function(req, res) {
+  app.post('/api/login', function(req, res) {
     console.log(req.body);
     res.setHeader('Cache-Control', 'no-cache');
     subscription.validateTokenFromGoogle(req.body.idToken, req.body, function(err) {
