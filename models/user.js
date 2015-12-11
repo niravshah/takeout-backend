@@ -11,6 +11,7 @@ var userSchema = new Schema({
   gcm: Schema.Types.Mixed, 
   active: Boolean,
   new: Boolean,
+  verified: Boolean,
   location: String,
   password: String,
   defaultService:String,

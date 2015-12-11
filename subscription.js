@@ -38,6 +38,7 @@ exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCal
                         personPhoto: userProps.personPhoto,
                         active: false,
                         new: true,
+                        verified: false,
                         gcm: '',
                         password:'',
                         defaultService:'s1',
