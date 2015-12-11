@@ -12,6 +12,17 @@ var serviceRoutes = require('./routes/service-routes.js')(app);
 var twilioRoutes = require('./routes/twilio-routes.js')(app);
 var postcodeRoutes = require('./routes/postcode-routes.js')(app);
 
+
+app.get('/api', function(req, res) {    
+    var arr = []
+    app._router.stack.forEach(function(each){
+        if(each.route != null)
+            arr.push(each.route.path)
+    })
+    
+    res.status(200).send(arr);   
+});
+
 var server = app.listen(3000, function() {
   var host = server.address().address;
   var port = server.address().port;

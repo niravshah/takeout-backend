@@ -12,7 +12,7 @@ var level = require("level-browserify");
 var levelgraph = require("levelgraph");
 var db = levelgraph(level("postcodes"));
 var geoLib = require('geolib');
-var jobs = require('./jobs.js');
+var jobs = require('./jobs-module.js');
 
 exports.getAllAvailableGrids = function(service) {  
   var key = "ninja:available:" + service + ":*"  

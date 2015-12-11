@@ -1,5 +1,5 @@
-var subscription = require('./../subscription.js');
-var notify = require('./../notifications.js');
+var subscription = require('./../modules/subscription-module.js');
+var notify = require('./../modules/notifications-module.js');
 var User = require('./../models/user');
 
 module.exports = function(app) {

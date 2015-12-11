@@ -1,7 +1,7 @@
 var exports = module.exports = {};
 var google_client_id = "1054636785796-j4ekc1r25nlmq0ut4fgehdqbi3i1o1on.apps.googleusercontent.com"
 var superagent = require('superagent');
-var User = require('./models/user');
+var User = require('./../models/user');
 //var mongoose = require('mongoose');
 var mongoose = require('mongoose-bird')();
 mongoose.connect('mongodb://localhost/gdn');

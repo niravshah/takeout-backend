@@ -1,4 +1,4 @@
-var nJ = require('./../ninja.js');
+var nJ = require('./../modules/ninja-module.js');
 
 module.exports = function(app){
 
