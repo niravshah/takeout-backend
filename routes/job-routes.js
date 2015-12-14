@@ -50,13 +50,14 @@ module.exports = function(app) {
                 });
             },
             function(result, callback) {
+                res.setHeader('Cache-Control', 'no-cache');
                 res.status(200).send(result)
             }
         ]);
     });
     app.get('/api/job/:requester_id/:jobid', function(req, res) {
         jobs.getJobInfo(req.params.requester_id, req.params.jobid, function(result) {
-            res.status(200).send(result)
+            res.status(200).send({'result': result})
         });
     });
 }

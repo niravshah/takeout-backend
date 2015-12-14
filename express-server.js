@@ -2,7 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser')
 
 var app = express();
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(express.static('public_html'));
 
 var commonRoutes = require('./routes/common-routes.js')(app);
 var ninjaRoutes = require('./routes/ninja-routes.js')(app);
@@ -11,6 +13,7 @@ var jobRoutes = require('./routes/job-routes.js')(app);
 var serviceRoutes = require('./routes/service-routes.js')(app);
 var twilioRoutes = require('./routes/twilio-routes.js')(app);
 var postcodeRoutes = require('./routes/postcode-routes.js')(app);
+var stripeRoutes = require('./routes/stripe-routes.js')(app);
 
 
 app.get('/api', function(req, res) {    
