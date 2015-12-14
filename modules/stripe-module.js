@@ -1,7 +1,8 @@
 var exports = module.exports = {};
 var stripe = require("stripe")("sk_test_aTh0omXn80N08tMdm2UKpyrC");
+var aSync = require('async');
 var User = require('./../models/user');
-var User = require('./../models/customer');
+var Customer = require('./../models/customer');
 exports.createCustomer = function(stripeToken, accountId, rC) {
     stripe.customers.create({
         source: stripeToken,
@@ -39,7 +40,6 @@ exports.createCustomer = function(stripeToken, accountId, rC) {
         rC(new Error('Stripe Customer Create Error'), null);
     });
 }
-
 exports.createNewStandaloneAccount = function(accountId, email, rC) {
     stripe.accounts.create({
         managed: false,
@@ -50,7 +50,6 @@ exports.createNewStandaloneAccount = function(accountId, email, rC) {
             accountId: accountId
         }).then(function(users) {
             if(users.length) {
-                //save the new connected account to the user acctId
                 users[0].connected = true;
                 users[0].saveAsync().then(function(savedUser) {
                     var newCustomer = Customer({
@@ -67,28 +66,59 @@ exports.createNewStandaloneAccount = function(accountId, email, rC) {
                     })
                 })
             }
-        }).catch(function(err) {
+        }).
+        catch(function(err) {
             rC(new Error('Error Updating User'), null)
         });
-    }).catch(function(err) {
-        rC(new Error('Stripe Charge Error'), null)
-    });
-}
-
-exports.chargeCustomer = function(customerId, amt, curr, recieverId, rC) {
-    stripe.charges.create({
-        amount: amt,
-        currency: curr,
-        customer: customerId,
-        source: 'card_7WykZ8lL2p11P8',
-        destination: recieverId,
-        application_fee: 200
-    }).then(function(charge) {
-        console.log('Success', charge);
-        rC(charge)
     }).
     catch(function(err) {
-        console.log('Error', err);
-        rC(err)
+        rC(new Error('Stripe Create Standalone Account Error'), null)
+    });
+}
+exports.chargeCustomer = function(custAcctId, amt, curr, recieverAcctId, rC) {
+    
+    var cId = null;
+    var sId = null;
+    var rId = null;
+    
+    aSync.parallel([
+        function(callback) {
+            Customer.findAsync({
+                accountId: custAcctId
+            }).then(function(customers) {
+                if(customers.length) {
+                    cId = customers[0].customerId;
+                    sId = customers[0].sourceId;
+                    callback()
+                }
+            });
+        },
+        function(callback) {
+            Customer.findAsync({
+                accountId: recieverAcctId
+            }).then(function(customers) {
+                if(customers.length) {
+                    rId = customers[0].saccountId;
+                    callback()
+                }
+            });
+        }
+    ], function(err) {
+        stripe.charges.create({
+            amount: amt,
+            currency: curr,
+            customer: cId,
+            source: sId,
+            destination: rId,
+            application_fee: 200
+        }).then(function(charge) {
+            console.log('Success', charge);
+            //TODO: Update Job Status            
+            rC(null, charge)
+        }).
+        catch(function(err) {
+            console.log('Error', err);
+            rC(new Error('Error Processing Charge'), null)
+        });
     });
 }

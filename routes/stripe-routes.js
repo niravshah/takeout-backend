@@ -9,14 +9,19 @@ module.exports = function(app) {
       })        
     });
     
-    app.get('/api/stripe/charge/:custid/:amt/:curr/:recieverid',function(req,res){        
-        stripe.chargeCustomer(req.params.custid,req.params.amt,req.params.curr, req.params.recieverid, function(result){res.status(200).send(result)})        
-    });
-    
-    app.get('/api/stripe/connect/:acctId/new',function(req,res){            
+     app.get('/api/stripe/connect/:acctId/new',function(req,res){            
         stripe.createNewStandaloneAccount(req.params.acctId, 'nirav.n@gs.com', function(err, result){
             if(err) res.status(500).send(err)
             else res.status(200).send(result)
         })    
     });
+    
+    app.get('/api/stripe/charge/:cust_acctid/:amt/:curr/:reciever_acctid',function(req,res){        
+        stripe.chargeCustomer(req.params.cust_acctid,req.params.amt,req.params.curr, req.params.reciever_acctid, function(err, result){
+            if(err) res.status(500).send(err)
+            else res.status(200).send(result)
+        })        
+    });
+    
+   
 }
