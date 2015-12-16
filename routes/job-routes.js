@@ -2,6 +2,7 @@ var nJ = require('./../modules/ninja-module.js');
 var jobs = require('./../modules/jobs-module.js');
 var aSync = require('async');
 var shortid = require('shortid');
+
 module.exports = function(app) {
     app.get('/api/job/:service/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', function(req, res) {
         aSync.waterfall([
@@ -26,11 +27,13 @@ module.exports = function(app) {
             }
         ])
     });
+    
     app.get('/api/job/:requester_id/:jobid/reject', function(req, res) {
         var key = "ninja:job:" + req.params.requester_id + ":" + req.params.jobid
         nJ.rejectJob(key)
         res.send('Rejecting Job!');
     });
+    
     app.get('/api/jobs/:requester_id', function(req, res) {
         aSync.waterfall([
             function(callback) {

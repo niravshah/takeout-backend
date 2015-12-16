@@ -38,7 +38,7 @@ module.exports = function(app) {
       res.status(500).send('Error')
     }, function(result) {
         console.log(JSON.stringify(result));
-      res.status(200).send(JSON.stringify(result))
+        res.status(200).send(JSON.stringify(result))
     })
   });
 }

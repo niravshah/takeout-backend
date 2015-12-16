@@ -1,0 +1,28 @@
+https://developers.google.com/android/reference/com/google/android/gms/common/GoogleApiAvailability#isGooglePlayServicesAvailable(android.content.Context)
+
+protected boolean checkPlayServices() {
+    final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity());
+    if (resultCode != ConnectionResult.SUCCESS) {
+        if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, activity(),
+                    PLAY_SERVICES_RESOLUTION_REQUEST);
+            if (dialog != null) {
+                dialog.show();
+                dialog.setOnDismissListener(new OnDismissListener() {
+                    public void onDismiss(DialogInterface dialog) {
+                        if (ConnectionResult.SERVICE_INVALID == resultCode) activity().finish();
+                    }
+                });
+                return false;
+            }
+        }
+        new CSAlertDialog(this).show("Google Play Services Error",
+                "This device is not supported for required Goole Play Services", "OK", new Call() {
+                    public void onCall(Object value) {
+                        activity().finish();
+                    }
+                });
+        return false;
+    }
+    return true;
+}
