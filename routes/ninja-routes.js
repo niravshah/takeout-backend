@@ -10,7 +10,7 @@ module.exports = function(app){
 
   app.get('/api/ninja/:ninjaid/:service/unavailable', function(req, res) {
     nJ.markNinjaUnavailable(req.params.ninjaid, req.params.service).then(function(result) {
-      res.sendStatus({'res':result})
+      res.status(200).send({'res':result})
     });
   });
   

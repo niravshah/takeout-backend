@@ -33,7 +33,7 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                 accountId: resp.body.sub
             }).then(function(user) {
                 if(user.length) {
-                    //console.log('Existing User:', user);
+                    console.log('Existing User:', user[0].accountId);
                     var token = jwt.sign(user, config.secret, {expiresIn: 86400});
                     user[0].token = token
                     resCallback(user[0])
@@ -79,13 +79,13 @@ exports.registerUserGCMToken = function(token, aId, personEmail, eC, rC) {
             //console.log(users[0])
             users[0].save(function(err) {
                 if(err) throw err;
-                console.log('GCM ID Updated!')
+                console.log('GCM ID Updated! - ', aId)
             });
         } else {
-            console.log('GCM - No Corresponding User Found')
-            var key = "gcm:" + aId
-            rediscli.set(key, token);
+            console.log('GCM - No Corresponding User Found -', aId)
         }
+        var key = "gcm:" + aId
+        rediscli.set(key, token);        
     })
 }
 

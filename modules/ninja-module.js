@@ -12,6 +12,7 @@ var levelgraph = require("levelgraph");
 var db = levelgraph(level("postcodes"));
 var geoLib = require('geolib');
 var jobs = require('./jobs-module.js');
+var nots = require('./notifications-module.js');
 
 exports.getAllAvailableGrids = function(service) {  
   var key = "ninja:available:" + service + ":*"  
@@ -97,7 +98,9 @@ exports.findNinjaForJob = function(jobkey, service, requester, pickup_latd, pick
         rediscli.lpop(key, function(err, res) {
           var key2 = jobkey + ":ninja:current";
           rediscli.set(key2, res, function(err, res) {
-            finalCallback(list)
+                if(err){console.log('ERROR - Setting Current Ninja:', err);}
+                else console.log("Current Ninja Set", res);
+                finalCallback(list)
           });
         });
       });
@@ -130,9 +133,14 @@ exports.findNinjaNearby = function(service, pickup_latd, pickup_lngd, finalCallb
 exports.requestPickup = function(jobkey) {
   //this function needs to sendout a GCM Message    
   var key = jobkey + ":ninja:current"
-  rediscli.get(key, function(err, result) {
-    console.log('Requesting Pickup for: ' + jobkey + ': from :' + result);
-  })
+  rediscli.getAsync(key).then(function(result) {
+    var gcmKey = "gcm:" + result;
+    rediscli.getAsync(gcmKey).then(function(result){
+        console.log('Requesting Pickup for: ' + jobkey + ': from :' + result + " : " + key + ": gcm : " + result);    
+        rediscli.getAsync(jobkey).then(function(jobDetails){nots.sendNotification(result,jobDetails)}).catch(function(err){console.log('ERROR:', err)});
+        
+    }).catch(function(err){console.log('ERROR:', err)})
+  }).catch(function(err){console.log('ERROR - requestPickup',err)});
 }
 
 exports.rejectJob = function(jobkey) {

@@ -7,8 +7,8 @@ var aSync = require('async');
 var geoLib = require('geolib');
 var Job = require('../models/job');
 
-exports.createNewJob = function(jobId, key, requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service) {
-    var val = requester_id + ":" + pickup_latd + ":" + pickup_lngd + ":" + drop_latd + ":" + drop_lngd;
+exports.createNewJob = function(jobId, key, requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service, address) {
+    var val = requester_id + ":" + jobId + ":" + pickup_latd + ":" + pickup_lngd + ":" + drop_latd + ":" + drop_lngd + ":" + address;
     rediscli.set(key, val)
     var jobsKey = "jobs:" + requester_id;
     rediscli.rpush(jobsKey, jobId)
