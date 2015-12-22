@@ -12,8 +12,8 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
+//JWT Middleware
 app.set('superSecret', config.secret); 
-
 app.use('/api/stripe',function(req, res, next) {
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -56,6 +56,7 @@ app.get('/api', function(req, res) {
     })
     res.status(200).send(arr);
 });
+
 var server = app.listen(3000, function() {
     var host = server.address().address;
     var port = server.address().port;

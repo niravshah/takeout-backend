@@ -9,7 +9,7 @@ module.exports = function(app) {
             function(callback) {
                 var jobId = shortid.generate();
                 var key = "job:" + req.params.requester_id + ":" + jobId
-                jobs.createNewJob(jobId, key, req.params.requester_id, req.params.pickup_latd, req.params.pickup_lngd, req.params.drop_latd, req.params.drop_lngd);
+                jobs.createNewJob(jobId, key, req.params.requester_id, req.params.pickup_latd, req.params.pickup_lngd, req.params.drop_latd, req.params.drop_lngd, req.params.service);
                 callback(null, key);
             },
             function(jobkey, callback) {

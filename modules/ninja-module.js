@@ -72,15 +72,15 @@ exports.findNinjaForJob = function(jobkey, service, requester, pickup_latd, pick
       reverseGeocode(pickup_latd, pickup_lngd, callback)
     },
     function(postcode, callback) {
-       console.log('Postcode', postcode)
+      console.log('Postcode', postcode)
       postcodeToGrid(postcode, callback)
     },
     function(grid, callback) {
-        console.log('Grid', grid)
+      console.log('Grid', grid)
       gridToNinjaLocations(service,grid, callback);
     },
     function(gridNinjas, callback) {
-        console.log('gridNinjas', gridNinjas)
+      console.log('gridNinjas', gridNinjas)
       locationPoints(true, pickup_latd, pickup_lngd, gridNinjas, callback);
     },
     function(points, callback) {
@@ -126,6 +126,7 @@ exports.findNinjaNearby = function(service, pickup_latd, pickup_lngd, finalCallb
     }
   ]);
 }
+
 exports.requestPickup = function(jobkey) {
   //this function needs to sendout a GCM Message    
   var key = jobkey + ":ninja:current"
@@ -133,6 +134,7 @@ exports.requestPickup = function(jobkey) {
     console.log('Requesting Pickup for: ' + jobkey + ': from :' + result);
   })
 }
+
 exports.rejectJob = function(jobkey) {
   rediscli.get(jobkey + ":ninja:current", function(err, result) {
     jobs.updateJobStatus(jobkey, "Pickup Rejected");

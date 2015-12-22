@@ -1,5 +1,6 @@
 var exports = module.exports = {};
 var google_client_id = "1054636785796-j4ekc1r25nlmq0ut4fgehdqbi3i1o1on.apps.googleusercontent.com"
+var google_client_id_ninja = "456137028163-js02529oilihsdcn1sq5ovtdjmp6rbpn.apps.googleusercontent.com"
 var superagent = require('superagent');
 var User = require('./../models/user');
 //var mongoose = require('mongoose');
@@ -9,12 +10,14 @@ var redis = require("redis");
 var rediscli = redis.createClient();
 
 var bcrypt = require('bcryptjs');
+var jwt = require('jsonwebtoken');
+var config = require('./../config');
 
 exports.gdnTest = function(id) {
     return gdn.get(id);
 }
 
-exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCallback) {
+exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, resCallback) {
     superagent.get("https://www.googleapis.com/oauth2/v3/tokeninfo").query({
         id_token: token
     }).end(function(err, resp) {
@@ -22,13 +25,17 @@ exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCal
             console.log('Google Token Info Error:', err)
             errCallback(err)
         }
-        if(resp.body.aud == google_client_id) {
-            console.log('Google Token Info Aud matches')
+        if(src == 'ninja') client_id = google_client_id_ninja;
+        else client_id = google_client_id
+        if(resp.body.aud == client_id) {
+            console.log('Google Token Info Aud matches', resp.body.sub)
             User.findAsync({
                 accountId: resp.body.sub
             }).then(function(user) {
                 if(user.length) {
-                    console.log('Existing User:', user);
+                    //console.log('Existing User:', user);
+                    var token = jwt.sign(user, config.secret, {expiresIn: 86400});
+                    user[0].token = token
                     resCallback(user[0])
                 } else {
                     var newUser = User({
@@ -47,17 +54,16 @@ exports.validateTokenFromGoogle = function(token, userProps, errCallback, resCal
                         defaultService:'s1',
                         defaultServiceName:'Takeaway Delivery'
                     });
-                    console.log('Saving User:', newUser)
+                    console.log('Saving New User')
                     newUser.saveAsync().then(function(newUsr) {
-                        console.log('New User:', newUsr[0]);
                         updateGCMFromRedis(userProps.accountId)
+                        var token = jwt.sign(user, config.secret, {expiresIn: 86400});
+                        newUsr[0].token = token                        
                         resCallback(newUsr[0])
                     }).
-                    catch(function(err) {
-                        if(err) throw err
-                            })
+                    catch(function(err) {if(err) throw err});
                 }
-            }).catch(function(err){console.log('User Find Error!');});            
+            }).catch(function(err){console.log('User Find Error!', err);});            
         }
     });
 }
@@ -68,9 +74,9 @@ exports.registerUserGCMToken = function(token, aId, personEmail, eC, rC) {
         accountId: aId
     }, function(err, users) {
         if(users.length) {
-            console.log('Token', token)
+            console.log('GCM Token', token, aId)
             users[0].gcm = '"' + token + '"';
-            console.log(users[0])
+            //console.log(users[0])
             users[0].save(function(err) {
                 if(err) throw err;
                 console.log('GCM ID Updated!')

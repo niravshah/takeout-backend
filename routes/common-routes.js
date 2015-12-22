@@ -18,7 +18,7 @@ module.exports = function(app) {
   });
   
   app.post('/api/gcm', function(req, res) {
-    console.log('GCM Token', req.body)
+    //console.log('GCM Token', req.body)
     subscription.registerUserGCMToken(req.body.gcm, req.body.accountId, req.body.personEmail);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(200).send(req.body)
@@ -32,13 +32,24 @@ module.exports = function(app) {
   });    
   
   app.post('/api/login', function(req, res) {
-    console.log(req.body);
+    //console.log(req.body);
     res.setHeader('Cache-Control', 'no-cache');
-    subscription.validateTokenFromGoogle(req.body.idToken, req.body, function(err) {
+    subscription.validateTokenFromGoogle('gdn',req.body.idToken, req.body, function(err) {
       res.status(500).send('Error')
     }, function(result) {
-        console.log(JSON.stringify(result));
+        //console.log(JSON.stringify(result));
         res.status(200).send(JSON.stringify(result))
     })
   });
+    
+  app.post('/api/ninja/login', function(req, res) {
+    //console.log(req.body);
+    res.setHeader('Cache-Control', 'no-cache');
+    subscription.validateTokenFromGoogle('ninja',req.body.idToken, req.body, function(err) {
+      res.status(500).send('Error')
+    }, function(result) {
+        //console.log(JSON.stringify(result));
+        res.status(200).send(JSON.stringify(result))
+    })
+  });    
 }
