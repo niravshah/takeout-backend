@@ -154,6 +154,14 @@ exports.rejectJob = function(jobkey) {
   })
 }
 
+exports.acceptJob = function(jobkey) {
+    jobs.updateJobStatus(jobkey, "Pickup Accepted");
+}
+
+exports.completeJob = function(jobkey) {
+    jobs.updateJobStatus(jobkey, "Complete");
+}
+
 function reverseGeocode(pickup_latd, pickup_lngd, callback) {
   geocoder.reverseGeocode(pickup_latd, pickup_lngd, function(err, data) {
     var list1 = _.find(data.results, function(dt) {

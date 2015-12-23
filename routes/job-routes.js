@@ -36,9 +36,15 @@ module.exports = function(app) {
     });
     
     app.get('/api/job/:requester_id/:jobid/accept', function(req, res) {
-        var key = "ninja:job:" + req.params.requester_id + ":" + req.params.jobid
-        //nJ.rejectJob(key);
+        var key = "job:" + req.params.requester_id + ":" + req.params.jobid
+        nJ.acceptJob(key);
         res.status(200).send({'result': 'Accepting Job!'})
+    });
+    
+    app.get('/api/job/:requester_id/:jobid/complete', function(req, res) {
+        var key = "job:" + req.params.requester_id + ":" + req.params.jobid
+        nJ.completeJob(key);
+        res.status(200).send({'result': 'Job Complete!'})
     });
 
     
