@@ -11,8 +11,11 @@ var jobCache = new nodecache();
 var jfsm = new fsm.jFSM();
 var global = {}
 
-exports.newJob = function(jobId, key, requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service, deliveryAddress, fcallback){   
-    console.log('newJob Module Function')
+exports.newJob = function(requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service, deliveryAddress, fcallback){   
+    
+    var jobId = shortid.generate();
+    var key = "job:" + requester_id + ":" + jobId;
+
     var job = {id : jobId, key:key, pickup_latd:pickup_latd,pickup_lngd:pickup_lngd, service:service, grid:'',list:''}
     jobs.createNewJob(jobId, key, requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service,deliveryAddress);
     aSync.waterfall([
@@ -60,6 +63,8 @@ exports.rejectJob = function(jobid,ninjaid, callback){
 }
 
 exports.completeJob = function(jobid,ninjaid, callback){
-    jfsm.complete(global[jobid])
+    jobs.updateJobStatus(global[jobid].key, 'Complete');
+    delete global[jobid]
+    console.log('Job Completed',job.id)
     callback({val:'test'});
 }

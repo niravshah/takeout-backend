@@ -143,25 +143,6 @@ exports.requestPickup = function(jobkey) {
   }).catch(function(err){console.log('ERROR - requestPickup',err)});
 }
 
-exports.rejectJob = function(jobkey) {
-  rediscli.get(jobkey + ":ninja:current", function(err, result) {
-    jobs.updateJobStatus(jobkey, "Pickup Rejected");
-    rediscli.lpop(jobkey + ":ninja", function(err, res) {
-      rediscli.set(jobkey + ":ninja:current", res, function(err, result) {
-        exports.requestPickup(jobkey)
-      })
-    })
-  })
-}
-
-exports.acceptJob = function(jobkey) {
-    jobs.updateJobStatus(jobkey, "Pickup Accepted");
-}
-
-exports.completeJob = function(jobkey) {
-    jobs.updateJobStatus(jobkey, "Complete");
-}
-
 var reverseGeocode = function(pickup_latd, pickup_lngd, callback) {
   geocoder.reverseGeocode(pickup_latd, pickup_lngd, function(err, data) {
     var list1 = _.find(data.results, function(dt) {

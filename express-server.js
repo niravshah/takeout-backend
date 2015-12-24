@@ -44,11 +44,12 @@ var commonRoutes = require('./routes/common-routes.js')(app);
 var ninjaRoutes = require('./routes/ninja-routes.js')(app);
 var gridRoutes = require('./routes/grid-routes.js')(app);
 var jobRoutes = require('./routes/job-routes.js')(app);
+var jobFsmRoutes = require('./routes/jobs-fsm-routes.js')(app);
 var serviceRoutes = require('./routes/service-routes.js')(app);
 var twilioRoutes = require('./routes/twilio-routes.js')(app);
 var postcodeRoutes = require('./routes/postcode-routes.js')(app);
 var stripeRoutes = require('./routes/stripe-routes.js')(app);
-var fsm = require('./routes/state-machine-routes.js')(app);
+
 
 app.get('/api', function(req, res) {
     var arr = []

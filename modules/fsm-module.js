@@ -100,28 +100,18 @@ exports.jFSM = machina.BehavioralFsm.extend( {
             _onEnter:function(job){ 
                 jobs.updateJobStatus(job.key, 'In Progress');
                 console.log('Job Accepted',job.id)
-            },
-            complete:"jobComplete"
-        },
-        jobCompleted:{
-            _onEnter:function(job){ 
-                jobs.updateJobStatus(job.key, 'Complete');
-                console.log('Job Completed',job.id)
             }
         }
     },
     newJob: function(job) {
-        this.handle(job, "start" );
+        this.handle(job, "start");
     },
     accept: function(job){
         this.handle(job, "accept" );        
     },
     reject: function(job){
         this.handle(job, "reject" );        
-    },
-    complete: function(job){
-        this.handle(job, "complete" );        
     }
-
+ 
 } );
 
