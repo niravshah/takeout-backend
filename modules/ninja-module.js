@@ -136,7 +136,7 @@ exports.requestPickup = function(jobkey) {
   rediscli.getAsync(key).then(function(result) {
     var gcmKey = "gcm:" + result;
     rediscli.getAsync(gcmKey).then(function(result){
-        console.log('Requesting Pickup for: ' + jobkey + ': from :' + result + " : " + key + ": gcm : " + result);    
+        console.log('Requesting Pickup for: ' + jobkey + ': from :' + result + " : " + key + ": gcm : " + result + " : gcmKey : " + gcmKey);    
         rediscli.getAsync(jobkey).then(function(jobDetails){nots.sendNotification(result,jobDetails)}).catch(function(err){console.log('ERROR:', err)});
         
     }).catch(function(err){console.log('ERROR:', err)})
@@ -162,7 +162,7 @@ exports.completeJob = function(jobkey) {
     jobs.updateJobStatus(jobkey, "Complete");
 }
 
-function reverseGeocode(pickup_latd, pickup_lngd, callback) {
+var reverseGeocode = function(pickup_latd, pickup_lngd, callback) {
   geocoder.reverseGeocode(pickup_latd, pickup_lngd, function(err, data) {
     var list1 = _.find(data.results, function(dt) {
       if(_.indexOf(dt.types, 'postal_code') > -1) return true
@@ -174,7 +174,9 @@ function reverseGeocode(pickup_latd, pickup_lngd, callback) {
   });
 }
 
-function postcodeToGrid(postcode, callback) {
+exports.reverseGeocode = reverseGeocode
+
+var postcodeToGrid =  function(postcode, callback) {
   db.get({
     subject: postcode,
     predicate: 'grid'
@@ -187,16 +189,20 @@ function postcodeToGrid(postcode, callback) {
   });
 }
 
-function gridToNinjaLocations(service, grid, callback) {
+exports.postcodeToGrid = postcodeToGrid
+
+var gridToNinjaLocations = function(service, grid, callback) {
   var key = "ninja:available:" + service + ":" + grid;
   rediscli.smembers(key, function(err, list) {
     rediscli.mget(list, function(err, list) {
-      callback(null, list)
+      callback(null, list,grid)
     });
   });
 }
 
-function locationPoints(includeSelf, pickup_latd, pickup_lngd, gridNinjas, callback) {
+exports.gridToNinjaLocations = gridToNinjaLocations
+
+var locationPoints = function(includeSelf, pickup_latd, pickup_lngd, gridNinjas, callback,grid) {
   var points = {}
   if(includeSelf) {
     var pickup = {}
@@ -213,6 +219,8 @@ function locationPoints(includeSelf, pickup_latd, pickup_lngd, gridNinjas, callb
     loc['longitude'] = arr[2]
     points[arr[0]] = loc;
   });
-  console.log(points);
-  callback(null, points);
+  //console.log(points);
+  callback(null, points,grid);
 }
+
+exports.locationPoints = locationPoints
