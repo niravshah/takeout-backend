@@ -6,6 +6,7 @@ var nJ = require('./ninja-module.js');
 var aSync = require('async');
 var geoLib = require('geolib');
 var nodecache = require("node-cache");
+var shortid = require('shortid')
 
 var jobCache = new nodecache();
 var jfsm = new fsm.jFSM();

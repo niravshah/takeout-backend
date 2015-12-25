@@ -10,7 +10,8 @@ var jobSchema = new Schema({
   dropLatd: String,
   dropLong: String,
   serviceId:String,
-  currentStatus:String
+  currentStatus:String,
+  servicedby:String
 });
 
 var Job = mongoose.model('Job', jobSchema);

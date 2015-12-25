@@ -99,6 +99,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
         jobAccepted: {
             _onEnter:function(job){ 
                 jobs.updateJobStatus(job.key, 'In Progress');
+                jobs.assignJob(job.key,job.currentNinja);
                 console.log('Job Accepted',job.id)
             }
         }
