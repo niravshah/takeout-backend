@@ -19,10 +19,17 @@ module.exports = function(app) {
   
   app.post('/api/gcm', function(req, res) {
     //console.log('GCM Token', req.body)
-    subscription.registerUserGCMToken(req.body.gcm, req.body.accountId, req.body.personEmail);
+    subscription.registerUserGCMToken(req.body.gcm, req.body.accountId, req.body.personEmail,false);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(200).send(req.body)
   });
+    
+  app.post('/api/gcm/ninja', function(req, res) {
+    //console.log('GCM Token', req.body)
+    subscription.registerUserGCMToken(req.body.gcm, req.body.accountId, req.body.personEmail,true);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.status(200).send(req.body)
+  });    
     
   app.post('/api/activate', function(req, res) {
     console.log('Activation', req.body)

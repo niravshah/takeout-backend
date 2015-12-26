@@ -11,6 +11,7 @@ var userSchema = new Schema({
   accountId:String,
   personPhoto:String,
   gcm: Schema.Types.Mixed,   
+  rgcm: Schema.Types.Mixed,   
   new: Boolean,
   verified: Boolean,
   active: Boolean,

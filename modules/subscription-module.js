@@ -50,13 +50,15 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                         new: true,
                         verified: false,
                         gcm: '',
+                        rgcm: '',
                         password:'',
                         defaultService:'s1',
                         defaultServiceName:'Takeaway Delivery'
                     });
                     console.log('Saving New User')
                     newUser.saveAsync().then(function(newUsr) {
-                        updateGCMFromRedis(userProps.accountId)
+                        updateGCMFromRedis(userProps.accountId);
+                        updateRGCMFromRedis(userProps.accountId);
                         var token = jwt.sign(user, config.secret, {expiresIn: 86400});
                         newUsr[0].token = token                        
                         resCallback(newUsr[0])
@@ -69,13 +71,17 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
 }
 
 
-exports.registerUserGCMToken = function(token, aId, personEmail, eC, rC) {
+exports.registerUserGCMToken = function(token, aId, personEmail, ninja) {
     User.find({
         accountId: aId
     }, function(err, users) {
         if(users.length) {
             console.log('GCM Token', token, aId)
-            users[0].gcm = '"' + token + '"';
+            if(ninja == true){
+                users[0].gcm = '"' + token + '"';
+            }else{
+                users[0].rgcm = '"' + token + '"';
+            }
             //console.log(users[0])
             users[0].save(function(err) {
                 if(err) throw err;
@@ -84,8 +90,13 @@ exports.registerUserGCMToken = function(token, aId, personEmail, eC, rC) {
         } else {
             console.log('GCM - No Corresponding User Found -', aId)
         }
-        var key = "gcm:" + aId
-        rediscli.set(key, token);        
+        if(ninja == true){
+            var key = "gcm:" + aId
+            rediscli.set(key, token);        
+        }else{
+            var key = "rgcm:" + aId
+            rediscli.set(key, token);                    
+        }
     })
 }
 
@@ -96,19 +107,44 @@ var updateGCMFromRedis = function(aId) {
         if(err) {
             throw err
         } else {
-            console.log('updateGCMFromRedis: Token Found', result);
-            console.log('updateGCMFromRedis: Account Id', aId);
+            console.log('GCM update: Token Found', result);
+            console.log('GCM update: Account Id', aId);
             User.findAsync({accountId: aId}).then(function(users) {
                 if(users.length) {
-                    console.log('updateGCMFromRedis: User Found');
+                    console.log('GCM update: User Found');
                     users[0].gcm = '"' + result + '"';
                     console.log('Saving User', users[0])
                     users[0].saveAsync().then(function(res){console.log('GCM ID Updated!', res)}).catch(function(err) {console.log('User Save Error', err)});
                 }else{
-                    console.log('User Not Found', users)    
+                    console.log('GCM update User Not Found', users)    
                 }
             }).catch(function(err) {
-                console.log('User Find Error',err)
+                console.log('GCM update User Find Error',err)
+            })
+        }
+    });
+}
+
+
+var updateRGCMFromRedis = function(aId) {
+    var key = "rgcm:" + aId
+    rediscli.get(key, function(err, result) {
+        if(err) {
+            console.log('Error while retrieving key from redis : ' + key,err)
+        } else {
+            console.log('rGCM update: Token Found', result);
+            console.log('rGCM update: Account Id', aId);
+            User.findAsync({accountId: aId}).then(function(users) {
+                if(users.length) {
+                    console.log('rGCM update: User Found');
+                    users[0].rgcm = '"' + result + '"';
+                    console.log('Saving User', users[0])
+                    users[0].saveAsync().then(function(res){console.log('rGCM ID Updated!', res)}).catch(function(err) {console.log('User Save Error', err)});
+                }else{
+                    console.log('rGCM update User Not Found', users)    
+                }
+            }).catch(function(err) {
+                console.log('rGCM update User Find Error',err)
             })
         }
     });

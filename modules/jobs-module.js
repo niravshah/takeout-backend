@@ -22,8 +22,9 @@ exports.createNewJob = function(jobId, key, requester_id, pickup_latd, pickup_ln
          dropLatd: drop_latd,
          dropLong: drop_lngd,
          serviceId: service,
-         currentStatus: "New",
-         servicedby:''
+         currentStatus: "new",
+         servicedby:'',
+         created: new Date
      });
      newJob.saveAsync().then(function(newJob) {}).
      catch(function(err) {})
@@ -42,7 +43,6 @@ exports.updateJobStatus = function(jobkey, status) {
 };
 
 exports.assignJob = function(jobkey,assignee){
-    
     rediscli.set(jobkey + ":assignee", assignee);
     Job.findAsync({
         jobKey: jobkey
@@ -52,7 +52,54 @@ exports.assignJob = function(jobkey,assignee){
             jobs[0].saveAsync().then(function(job){}).catch(function(err){})
         }
     }).catch(function(err) {})    
-    
+}
+
+exports.findLiveJobsByRequesterId = function(requester,callback){
+     Job.findAsync({
+        requesterId: requester,
+        currentStatus:{ $in: ['new', 'in_progress','looking_for_amigos'] }
+    }).then(function(jobs) {
+        if(jobs.length){
+           callback(null,jobs)
+        }else{
+            console.log('No Live Jobs found')
+            callback(null,{})
+        }
+    }).catch(function(err) {
+         callback(err,null)
+     })       
+}
+
+exports.findAllJobsByRequesterId = function(requester,callback){
+     Job.findAsync({
+        requesterId: requester,
+    }).then(function(jobs) {
+        if(jobs.length){
+           callback(null,jobs)
+        }else{
+            console.log('No Jobs found')
+            callback(null,{})
+        }
+    }).catch(function(err) {
+         callback(err,null)
+     })       
+}
+
+
+exports.findJobsByAssigneeAndStatus = function(asignee,status,callback){
+     Job.findAsync({
+        servicedby: asignee,
+        currentStatus:status
+    }).then(function(jobs) {
+        if(jobs.length){
+           callback(null,jobs)
+        }else{
+            console.log('No Jobs found')
+            callback(null,{})
+        }
+    }).catch(function(err) {
+         callback(err,null)
+     })   
 }
 
 exports.getJobInfo = function(requester_id, jobid, callback) {
@@ -62,7 +109,7 @@ exports.getJobInfo = function(requester_id, jobid, callback) {
     var key3 = key2 + ":current"
     rediscli.mget([key, key1, key3], function(err, response) {
         rediscli.lrange(key2, 0, -1, function(err, result) {
-            console.log(result);
+            //console.log(result);
             var arr = response.concat(result);
             callback(arr)
         })

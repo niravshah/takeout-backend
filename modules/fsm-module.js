@@ -19,6 +19,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
             _onEnter:function(job){         
                 job.list.shift(); 
                 if(job.list.length>0){
+                    
                     job.currentNinja = job.list[0].key                
                     console.log(job.id + ' : checkoutCurrentNinja _onEnter : Calling :',job.currentNinja);  
                     var listKey = "ninja:available:" + job.service + ":" + job.grid
@@ -61,7 +62,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
         contactNinja: {
              _onEnter: function(job) {
                  console.log(job.id + ' : contactNinja _onEnter : Calling :',job.currentNinja);   
-                 jobs.updateJobStatus(job.key, 'Ninja Contacted');
+                 jobs.updateJobStatus(job.key, 'looking_for_amigos');
                  nJ.requestPickup(job.key);
                  job.timer = setTimeout( function() {
                      console.log("Timeout",job.id)
@@ -92,14 +93,16 @@ exports.jFSM = machina.BehavioralFsm.extend( {
         },
         jobTerminated : {
             _onEnter:function(job){                
-                jobs.updateJobStatus(job.key, 'Cant Fulfill');
+                jobs.updateJobStatus(job.key, 'no_amigo_available');
+                nJ.notifyJobRejected(job.requester_id,job.key);
                 console.log('Cant find any more Ninjas! Exiting',job.id)
             }
         },
         jobAccepted: {
             _onEnter:function(job){ 
-                jobs.updateJobStatus(job.key, 'In Progress');
+                jobs.updateJobStatus(job.key, 'in_progress');
                 jobs.assignJob(job.key,job.currentNinja);
+                nJ.notifyJobAccepted(job.requester_id,job.key);
                 console.log('Job Accepted',job.id)
             }
         }

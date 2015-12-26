@@ -17,7 +17,7 @@ exports.newJob = function(requester_id, pickup_latd, pickup_lngd, drop_latd, dro
     var jobId = shortid.generate();
     var key = "job:" + requester_id + ":" + jobId;
 
-    var job = {id : jobId, key:key, pickup_latd:pickup_latd,pickup_lngd:pickup_lngd, service:service, grid:'',list:''}
+    var job = {id : jobId, key:key, pickup_latd:pickup_latd,pickup_lngd:pickup_lngd, service:service, grid:'',list:'',requester_id:requester_id}
     jobs.createNewJob(jobId, key, requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service,deliveryAddress);
     aSync.waterfall([
         function(callback) {
@@ -41,12 +41,12 @@ exports.newJob = function(requester_id, pickup_latd, pickup_lngd, drop_latd, dro
             if(list.length > 1){
                 job.list = list;            
                 job.grid = grid;       
-                jobs.updateJobStatus(key, 'Ninja Found');
+                jobs.updateJobStatus(key, 'looking_for_amigos');
                 jfsm.newJob(job);
                 global[jobId] = job
                 fcallback(job);    
             }else{
-                jobs.updateJobStatus(key, 'No Ninja Available');
+                jobs.updateJobStatus(key, 'no_amigo_available');
                 fcallback(job);  
             }
         }
@@ -54,18 +54,18 @@ exports.newJob = function(requester_id, pickup_latd, pickup_lngd, drop_latd, dro
 }
 
 exports.acceptJob = function(jobid,ninjaid, callback){
+    //console.log('acceptJob',jobid,global[jobid],global)
     jfsm.accept(global[jobid])
-    callback({val:'test'});
+    callback({msg:'job_accepted'});
 }
 
 exports.rejectJob = function(jobid,ninjaid, callback){
     jfsm.reject(global[jobid])
-    callback({val:'test'});
+    callback({msg:'job_rejected'});
 }
 
 exports.completeJob = function(jobid,ninjaid, callback){
-    jobs.updateJobStatus(global[jobid].key, 'Complete');
+    jobs.updateJobStatus(global[jobid].key, 'complete');
     delete global[jobid]
-    console.log('Job Completed',job.id)
-    callback({val:'test'});
+    callback({msg:'job_marked_complete'});
 }

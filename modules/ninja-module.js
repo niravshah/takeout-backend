@@ -120,9 +120,9 @@ exports.findNinjaNearby = function(service, pickup_latd, pickup_lngd, finalCallb
         gridToNinjaLocations(service, grid, callback);
       }
     },
-    function(gridNinjas, callback) {
+    function(gridNinjas,grid, callback) {
       if(gridNinjas != null) {
-        locationPoints(false, pickup_latd, pickup_lngd, gridNinjas, callback);
+        locationPoints(false, pickup_latd, pickup_lngd, gridNinjas, callback,grid);
       }
     },function(list){
         finalCallback(list)
@@ -142,6 +142,21 @@ exports.requestPickup = function(jobkey) {
     }).catch(function(err){console.log('ERROR:', err)})
   }).catch(function(err){console.log('ERROR - requestPickup',err)});
 }
+
+exports.notifyJobRejected = function(requester_id,jobkey) {
+    var gcmKey = "rgcm:" + result;
+    rediscli.getAsync(gcmKey).then(function(result){
+        rediscli.getAsync(jobkey).then(function(jobDetails){nots.notifyJobRejected(result,jobDetails)}).catch(function(err){console.log('ERROR:', err)});
+    }).catch(function(err){console.log('ERROR:', err)})
+}
+
+exports.notifyJobAccepted = function(requester_id,jobkey) {
+    var gcmKey = "rgcm:" + requester_id;
+    rediscli.getAsync(gcmKey).then(function(result){
+        rediscli.getAsync(jobkey).then(function(jobDetails){nots.notifyJobAccepted(result,jobDetails)}).catch(function(err){console.log('ERROR:', err)});
+    }).catch(function(err){console.log('ERROR:', err)})
+}
+
 
 var reverseGeocode = function(pickup_latd, pickup_lngd, callback) {
   geocoder.reverseGeocode(pickup_latd, pickup_lngd, function(err, data) {
