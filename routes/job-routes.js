@@ -17,7 +17,7 @@ module.exports = function(app) {
     });
     
     app.get('/api/jobs/:requester_id/pending', function(req, res) {
-        jobs.findAllPaymentPendingJobs(req.params.requester_id,function(err,result){
+        jobs.findPaymentPendingJobsByRequester(req.params.requester_id,function(err,result){
             if(err) res.status(500).send({msg:'Error while retrieving jobs'})
             else {
                 res.setHeader('Cache-Control', 'no-cache');
@@ -27,7 +27,7 @@ module.exports = function(app) {
     });    
     
      app.get('/api/jobs/:requester_id/all', function(req, res) {
-        jobs.findAllJobsByRequesterId(req.params.requester_id,function(err,result){
+        jobs.findJobsByRequesterId(req.params.requester_id,function(err,result){
             if(err) res.status(500).send({msg:'Error while retrieving jobs'})
             else {
                 res.setHeader('Cache-Control', 'no-cache');
@@ -35,6 +35,36 @@ module.exports = function(app) {
             }
         })
     });
+    
+     app.get('/api/jobs/ninja/:requester_id/live', function(req, res) {
+        jobs.findLiveJobsByServicer(req.params.requester_id,function(err,result){
+            if(err) res.status(500).send({msg:'Error while retrieving jobs'})
+            else {
+                res.setHeader('Cache-Control', 'no-cache');
+                res.status(200).send(result)
+            }
+        })
+    });
+    
+    app.get('/api/jobs/ninja/:requester_id/pending', function(req, res) {
+        jobs.findPaymentPendingJobsByServicer(req.params.requester_id,function(err,result){
+            if(err) res.status(500).send({msg:'Error while retrieving jobs'})
+            else {
+                res.setHeader('Cache-Control', 'no-cache');
+                res.status(200).send(result)
+            }
+        })
+    });    
+    
+     app.get('/api/jobs/ninja/:requester_id/all', function(req, res) {
+        jobs.findJobsByServicer(req.params.requester_id,function(err,result){
+            if(err) res.status(500).send({msg:'Error while retrieving jobs'})
+            else {
+                res.setHeader('Cache-Control', 'no-cache');
+                res.status(200).send(result)
+            }
+        })
+    });    
 
     app.get('/api/jobs/asignee/:asignee_id/:status', function(req, res) {
         jobs.findJobsByAssigneeAndStatus(req.params.asignee_id,req.params.status,function(err,result){

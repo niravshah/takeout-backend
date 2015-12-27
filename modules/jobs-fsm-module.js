@@ -6,7 +6,10 @@ var nJ = require('./ninja-module.js');
 var aSync = require('async');
 var geoLib = require('geolib');
 var nodecache = require("node-cache");
-var shortid = require('shortid')
+var shortid = require('shortid');
+var redis = require("redis");
+var rediscli = redis.createClient();
+
 
 var jobCache = new nodecache();
 var jfsm = new fsm.jFSM();
@@ -66,7 +69,11 @@ exports.rejectJob = function(jobid,ninjaid, callback){
 
 exports.completeJob = function(jobid,ninjaid, callback){
     //console.log('completeJob',jobid,global[jobid],global)
-    jobs.updateJobStatus(global[jobid].key, 'payment_pending');
+    var job = global[jobid];
+    jobs.updateJobStatus(job.key, 'payment_pending');
+    var listKey = "ninja:available:" + job.service + ":" + job.grid
+    var ninjaKey = "ninja:" + job.currentNinja + ":location"    
+    rediscli.sadd(listKey,ninjaKey,function(err,res){});
     delete global[jobid]
     callback({msg:'job_marked_complete'});
 }

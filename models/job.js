@@ -5,6 +5,7 @@ var jobSchema = new Schema({
   jobId:String,
   jobKey:String,
   requesterId:String,
+  rid:{type: mongoose.Schema.ObjectId, ref: 'User' },
   pickupLatd: String,
   pickupLong:String,
   dropLatd: String,
@@ -12,7 +13,9 @@ var jobSchema = new Schema({
   serviceId:String,
   currentStatus:String,
   servicedby:String,
-  created:Date
+  sid:{type: mongoose.Schema.ObjectId, ref: 'User' },
+  created:Date,
+  address:String
 });
 
 var Job = mongoose.model('Job', jobSchema);

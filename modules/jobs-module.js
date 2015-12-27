@@ -5,29 +5,42 @@ var geocoder = require('geocoder');
 var _ = require('underscore');
 var aSync = require('async');
 var geoLib = require('geolib');
+
 var Job = require('../models/job');
+var User = require('../models/user');
 
 exports.createNewJob = function(jobId, key, requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service, address) {
-     var val = requester_id + ":" + jobId + ":" + pickup_latd + ":" + pickup_lngd + ":" + drop_latd + ":" + drop_lngd + ":" + address;
-     rediscli.set(key, val)
-     var jobsKey = "jobs:" + requester_id;
-     rediscli.rpush(jobsKey, jobId)
-     exports.updateJobStatus(key, "New");
-     var newJob = Job({
-         jobId: jobId,
-         jobKey: key,
-         requesterId: requester_id,
-         pickupLatd: pickup_latd,
-         pickupLong: pickup_lngd,
-         dropLatd: drop_latd,
-         dropLong: drop_lngd,
-         serviceId: service,
-         currentStatus: "new",
-         servicedby:'',
-         created: new Date
-     });
-     newJob.saveAsync().then(function(newJob) {}).
-     catch(function(err) {})
+     
+    var val = requester_id + ":" + jobId + ":" + pickup_latd + ":" + pickup_lngd + ":" + drop_latd + ":" + drop_lngd + ":" + address;
+    rediscli.set(key, val)
+    var jobsKey = "jobs:" + requester_id;
+    rediscli.rpush(jobsKey, jobId)
+    
+    exports.updateJobStatus(key, "New");
+
+    User.findAsync({
+        accountId: requester_id
+    }).then(function(user) {
+
+        var newJob = Job({
+            jobId: jobId,
+            jobKey: key,
+            requesterId: requester_id,
+            rid:user[0]._id,
+            pickupLatd: pickup_latd,
+            pickupLong: pickup_lngd,
+            dropLatd: drop_latd,
+            dropLong: drop_lngd,
+            serviceId: service,
+            currentStatus: "new",
+            servicedby:'',
+            created: new Date,
+            address:address
+        });
+    
+        newJob.saveAsync().then(function(newJob) {}).catch(function(err) {})
+    });
+    
 };
 
 exports.updateJobStatus = function(jobkey, status) {
@@ -42,6 +55,23 @@ exports.updateJobStatus = function(jobkey, status) {
     }).catch(function(err) {})
 };
 
+exports.updateJobServicedBy = function(jobkey, ninja) {
+  
+    User.findAsync({
+        accountId: ninja
+    }).then(function(user) {
+        Job.findAsync({
+            jobKey: jobkey
+        }).then(function(jobs) {
+            if(jobs.length){
+                jobs[0].sid = user[0]._id;
+                jobs[0].saveAsync().then(function(job){}).catch(function(err){})
+            }
+        }).catch(function(err) {})    
+    });
+     
+}
+
 exports.assignJob = function(jobkey,assignee){
     rediscli.set(jobkey + ":assignee", assignee);
     Job.findAsync({
@@ -54,10 +84,9 @@ exports.assignJob = function(jobkey,assignee){
     }).catch(function(err) {})    
 }
 
-exports.findLiveJobsByRequesterId = function(requester,callback){
+exports.findJobsByRequesterId = function(requester,callback){
      Job.findAsync({
-        requesterId: requester,
-        currentStatus:{ $in: ['new', 'in_progress','looking_for_amigos'] }
+        requesterId: requester
     }).then(function(jobs) {
         if(jobs.length){
            callback(null,jobs)
@@ -86,9 +115,62 @@ exports.findLiveJobsByRequesterId = function(requester,callback){
      })       
 }
 
-exports.findAllPaymentPendingJobs = function(requester,callback){
-     Job.findAsync({
+exports.findPaymentPendingJobsByRequester = function(requester,callback){
+          
+    Job.find({
         requesterId: requester,
+        currentStatus:{ $in: ['payment_pending'] }
+    }).populate('sid').exec(function(err,jobs){
+        if(err){
+            callback(err,null)
+        }else if(jobs.length){
+            var results = jobs.map(function(job){
+                return {jobId:job.jobId,currentStatus:job.currentStatus ,servicedby:job.sid.personName}
+            })            
+            //console.log('findPaymentPendingJobsByRequester', results)
+            callback(null,results)
+        }else{
+            console.log('No Jobs found')
+            callback(null,{})
+        }     
+    })
+}
+
+
+exports.findJobsByServicer = function(requester,callback){
+     Job.findAsync({
+        servicedby: requester
+    }).then(function(jobs) {
+        if(jobs.length){
+           callback(null,jobs)
+        }else{
+            console.log('No Live Jobs found')
+            callback(null,{})
+        }
+    }).catch(function(err) {
+         callback(err,null)
+     })       
+}
+
+exports.findLiveJobsByServicer = function(requester,callback){
+     Job.findAsync({
+        servicedby: requester,
+        currentStatus:{ $in: ['new', 'in_progress','looking_for_amigos'] }
+    }).then(function(jobs) {
+        if(jobs.length){
+           callback(null,jobs)
+        }else{
+            console.log('No Live Jobs found')
+            callback(null,{})
+        }
+    }).catch(function(err) {
+         callback(err,null)
+     })       
+}
+
+exports.findPaymentPendingJobsByServicer = function(servicer,callback){
+     Job.findAsync({
+        servicedby: servicer,
         currentStatus:{ $in: ['payment_pending'] }
     }).then(function(jobs) {
         if(jobs.length){
@@ -101,6 +183,9 @@ exports.findAllPaymentPendingJobs = function(requester,callback){
          callback(err,null)
      })       
 }
+
+
+
 
 
 exports.findJobsByAssigneeAndStatus = function(asignee,status,callback){
