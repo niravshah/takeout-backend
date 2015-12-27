@@ -71,6 +71,8 @@ exports.completeJob = function(jobid,ninjaid, callback){
     //console.log('completeJob',jobid,global[jobid],global)
     var job = global[jobid];
     jobs.updateJobStatus(job.key, 'payment_pending');
+    nJ.updateNinjaStatus(job.currentNinja,job.service,'available');
+    
     var listKey = "ninja:available:" + job.service + ":" + job.grid
     var ninjaKey = "ninja:" + job.currentNinja + ":location"    
     rediscli.sadd(listKey,ninjaKey,function(err,res){});

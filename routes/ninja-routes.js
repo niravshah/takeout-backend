@@ -21,6 +21,14 @@ module.exports = function(app){
       res.status(200).send(result)
     });
   });
+    
+ app.get('/api/ninja/:ninjaid/status/:service', function(req, res) {
+    nJ.getNinjaStatus(req.params.ninjaid,req.params.service,function(err,result) {
+        res.setHeader('Cache-Control', 'no-cache');
+        if(err) res.status(500).send({'error':err});
+        else res.status(200).send({'result':result})
+    });
+  });    
 
   app.get('/api/:service/nearby/:pickup_latd/:pickup_lngd', function(req, res) {
     nJ.findNinjaNearby(req.params.service,req.params.pickup_latd, req.params.pickup_lngd, function(result) {

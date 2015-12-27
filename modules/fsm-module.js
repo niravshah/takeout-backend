@@ -64,6 +64,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
                  console.log(job.id + ' : contactNinja _onEnter : Calling :',job.currentNinja);   
                  jobs.updateJobStatus(job.key, 'looking_for_amigos');
                  nJ.requestPickup(job.key);
+                 nJ.updateNinjaStatus(job.currentNinja,job.service,'unavailable');
                  job.timer = setTimeout( function() {
                      console.log("Timeout",job.id)
                      this.handle(job, "timeout" );
@@ -80,7 +81,9 @@ exports.jFSM = machina.BehavioralFsm.extend( {
             _onEnter:function(job){           
                 var listKey = "ninja:available:" + job.service + ":" + job.grid
                 var ninjaKey = "ninja:" + job.currentNinja + ":location"
-                rediscli.saddAsync(listKey,ninjaKey).then(function(res){}).catch(function(err){})                    
+                rediscli.saddAsync(listKey,ninjaKey).then(function(res){}).catch(function(err){})        
+                nJ.updateNinjaStatus(job.currentNinja,job.service,'available');
+                
                 console.log(job.id + ' : ninjaRejected',job.currentNinja);
                 if(job.list.length > 0){
                     this.handle(job,"restart")    

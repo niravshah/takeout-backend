@@ -42,6 +42,21 @@ exports.markNinjaUnavailable = function(ninjaid, service) {
   })
 };
 
+exports.updateNinjaStatus = function(ninjaid, service, status) {
+  var key1 = "ninja:" + ninjaid + ":" + service + ":status";
+  var val1 = status;
+  rediscli.set(key1, val1);
+};
+
+exports.getNinjaStatus = function(ninjaid, service, callback) {
+  var key1 = "ninja:" + ninjaid + ":" + service + ":status";
+    rediscli.get(key1,function(err,res){
+        if(err) callback(err,null);
+        else callback(null,res)
+        });
+};
+
+
 exports.markNinjaAvailable = function(ninjaid, service, latd, lngd, finalCallback) {
   aSync.waterfall([
     function(callback) {
@@ -67,6 +82,7 @@ exports.markNinjaAvailable = function(ninjaid, service, latd, lngd, finalCallbac
     }
   ]);
 };
+
 exports.findNinjaForJob = function(jobkey, service, requester, pickup_latd, pickup_lngd, drop_latd, drop_lngd, finalCallback) {
   aSync.waterfall([
     function(callback) {
