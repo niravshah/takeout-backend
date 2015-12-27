@@ -25,7 +25,7 @@ exports.notifyJobRejected = function(gcm_id,details) {
   var gdn_sender = new gcm.Sender('AIzaSyDkGF_h3MydOEmWnJUcR-1pYQbOiEMFxCU');
   var registrationTokens = [];
   registrationTokens.push(gcm_id);
-  amigo_sender.sendNoRetry(message, {
+  gdn_sender.sendNoRetry(message, {
     registrationTokens: registrationTokens
   }, function(err, response) {
     if(err) console.error('Error', err);

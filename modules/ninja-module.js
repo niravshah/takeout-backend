@@ -118,13 +118,21 @@ exports.findNinjaNearby = function(service, pickup_latd, pickup_lngd, finalCallb
     function(grid, callback) {
       if(grid != null) {
         gridToNinjaLocations(service, grid, callback);
+      }else{
+          //console.log("gridToNinjaLocations - no grid")
+          callback(null,null,null)
       }
     },
     function(gridNinjas,grid, callback) {
       if(gridNinjas != null) {
+        //console.log(gridNinjas,grid)
         locationPoints(false, pickup_latd, pickup_lngd, gridNinjas, callback,grid);
+      }else{
+          //console.log("locationPoints - no gridNinjas")
+          callback([])
       }
     },function(list){
+        console.log("findNinjaNearby", list)
         finalCallback(list)
     }
   ]);
@@ -144,7 +152,7 @@ exports.requestPickup = function(jobkey) {
 }
 
 exports.notifyJobRejected = function(requester_id,jobkey) {
-    var gcmKey = "rgcm:" + result;
+    var gcmKey = "rgcm:" + requester_id;
     rediscli.getAsync(gcmKey).then(function(result){
         rediscli.getAsync(jobkey).then(function(jobDetails){nots.notifyJobRejected(result,jobDetails)}).catch(function(err){console.log('ERROR:', err)});
     }).catch(function(err){console.log('ERROR:', err)})
@@ -190,9 +198,13 @@ exports.postcodeToGrid = postcodeToGrid
 var gridToNinjaLocations = function(service, grid, callback) {
   var key = "ninja:available:" + service + ":" + grid;
   rediscli.smembers(key, function(err, list) {
-    rediscli.mget(list, function(err, list) {
-      callback(null, list,grid)
-    });
+    if(list.length > 0){
+        rediscli.mget(list, function(err, list) {
+          callback(null, list,grid)
+        });
+    }else{
+        callback(null, list,grid)
+    }
   });
 }
 
@@ -200,21 +212,24 @@ exports.gridToNinjaLocations = gridToNinjaLocations
 
 var locationPoints = function(includeSelf, pickup_latd, pickup_lngd, gridNinjas, callback,grid) {
   var points = {}
-  if(includeSelf) {
-    var pickup = {}
-    pickup['latitude'] = pickup_latd;
-    pickup['longitude'] = pickup_lngd;
-    points['self'] = pickup;
+  if(gridNinjas.length > 0){
+      if(includeSelf) {
+        var pickup = {}
+        pickup['latitude'] = pickup_latd;
+        pickup['longitude'] = pickup_lngd;
+        points['self'] = pickup;
+      }
+      //console.log(gridNinjas);
+
+      _(gridNinjas).each(function(ninja, key) {
+        console.log(ninja,key)
+        var arr = ninja.split(":")
+        var loc = {}
+        loc['latitude'] = arr[1]
+        loc['longitude'] = arr[2]
+        points[arr[0]] = loc;
+      });
   }
-  //console.log(gridNinjas);
-  _(gridNinjas).each(function(ninja, key) {
-    //console.log(ninja)
-    var arr = ninja.split(":")
-    var loc = {}
-    loc['latitude'] = arr[1]
-    loc['longitude'] = arr[2]
-    points[arr[0]] = loc;
-  });
   //console.log(points);
   callback(null, points,grid);
 }

@@ -40,6 +40,16 @@ module.exports = function(app) {
         })
     });
     
+    app.get('/api/jobs/:requester_id/pending', function(req, res) {
+        jobs.findAllPaymentPendingJobs(req.params.requester_id,function(err,result){
+            if(err) res.status(500).send({msg:'Error while retrieving jobs'})
+            else {
+                res.setHeader('Cache-Control', 'no-cache');
+                res.status(200).send(result)
+            }
+        })
+    });    
+    
      app.get('/api/jobs/:requester_id/all', function(req, res) {
         jobs.findAllJobsByRequesterId(req.params.requester_id,function(err,result){
             if(err) res.status(500).send({msg:'Error while retrieving jobs'})

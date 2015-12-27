@@ -65,7 +65,8 @@ exports.rejectJob = function(jobid,ninjaid, callback){
 }
 
 exports.completeJob = function(jobid,ninjaid, callback){
-    jobs.updateJobStatus(global[jobid].key, 'complete');
+    //console.log('completeJob',jobid,global[jobid],global)
+    jobs.updateJobStatus(global[jobid].key, 'payment_pending');
     delete global[jobid]
     callback({msg:'job_marked_complete'});
 }

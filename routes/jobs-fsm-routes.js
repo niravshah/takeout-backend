@@ -11,7 +11,7 @@ module.exports = function(app) {
     });
     
     app.get('/api/job/:jobid/:ninjaid/reject', function(req, res) {        
-        fsm.rejecttJob(req.params.jobid,req.params.ninjaid, function(result){res.status(200).send(result)})
+        fsm.rejectJob(req.params.jobid,req.params.ninjaid, function(result){res.status(200).send(result)})
     });
     
     app.get('/api/job/:jobid/:ninjaid/complete', function(req, res) {        

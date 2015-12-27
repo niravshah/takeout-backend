@@ -36,7 +36,7 @@ exports.updateJobStatus = function(jobkey, status) {
         jobKey: jobkey
     }).then(function(jobs) {
         if(jobs.length){
-            jobs[0].status = status;
+            jobs[0].currentStatus = status;
             jobs[0].saveAsync().then(function(job){}).catch(function(err){})
         }
     }).catch(function(err) {})
@@ -70,9 +70,26 @@ exports.findLiveJobsByRequesterId = function(requester,callback){
      })       
 }
 
-exports.findAllJobsByRequesterId = function(requester,callback){
+exports.findLiveJobsByRequesterId = function(requester,callback){
      Job.findAsync({
         requesterId: requester,
+        currentStatus:{ $in: ['new', 'in_progress','looking_for_amigos'] }
+    }).then(function(jobs) {
+        if(jobs.length){
+           callback(null,jobs)
+        }else{
+            console.log('No Live Jobs found')
+            callback(null,{})
+        }
+    }).catch(function(err) {
+         callback(err,null)
+     })       
+}
+
+exports.findAllPaymentPendingJobs = function(requester,callback){
+     Job.findAsync({
+        requesterId: requester,
+        currentStatus:{ $in: ['payment_pending'] }
     }).then(function(jobs) {
         if(jobs.length){
            callback(null,jobs)
