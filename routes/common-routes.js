@@ -32,11 +32,16 @@ module.exports = function(app) {
   });    
     
   app.post('/api/activate', function(req, res) {
-    console.log('Activation', req.body)
-    subscription.updatePassword(req.body.aId, req.body.password);
+    subscription.updatePassword(req.body.aId, req.body.password, req.body.personName);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(200).send(req.body)
-  });    
+  });  
+    
+ app.post('/api/:accountid/update/image', function(req, res) {
+    subscription.updateImage(req.params.accountid, req.body.personPhoto);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.status(200).send(req.body)
+  });      
   
   app.post('/api/login', function(req, res) {
     //console.log(req.body);

@@ -18,6 +18,7 @@ exports.createCustomer = function(stripeToken, accountId, rC) {
                 users[0].valid_till_m = customer.sources.data[0].exp_month;
                 users[0].valid_till_y = customer.sources.data[0].exp_year;
                 users[0].saveAsync().then(function(savedUser) {
+                    console.log('Saved User', savedUser);
                     var newCustomer = Customer({
                         accountId: accountId,
                         customerId: customer.sources.data[0].customer,

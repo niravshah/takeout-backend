@@ -8,7 +8,10 @@ module.exports = function(app) {
               console.log('createCustomer Error', err)
               res.status(500).send(err)
           }
-          else res.status(200).send(result)
+          else{ 
+              res.setHeader('Cache-Control', 'no-cache');
+              res.status(200).send(result)
+          }
       })        
     });
     
