@@ -108,7 +108,7 @@ exports.findLiveJobsByRequesterId = function(requester,callback){
            callback(null,jobs)
         }else{
             console.log('No Live Jobs found')
-            callback(null,{})
+            callback(null,[])
         }
     }).catch(function(err) {
          callback(err,null)
@@ -125,7 +125,7 @@ exports.findPaymentPendingJobsByRequester = function(requester,callback){
             callback(err,null)
         }else if(jobs.length){
             var results = jobs.map(function(job){
-                return {jobId:job.jobId,currentStatus:job.currentStatus ,servicedby:job.sid.personName}
+                return {jobId:job.jobId,currentStatus:job.currentStatus, address: job.address, date: job.created,servicedby:job.sid.personName, sid:job.sid.accountId,sphoto:job.sid.personPhoto}
             })            
             //console.log('findPaymentPendingJobsByRequester', results)
             callback(null,results)
@@ -161,7 +161,7 @@ exports.findLiveJobsByServicer = function(requester,callback){
            callback(null,jobs)
         }else{
             console.log('No Live Jobs found')
-            callback(null,{})
+            callback(null,[])
         }
     }).catch(function(err) {
          callback(err,null)

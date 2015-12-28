@@ -4,7 +4,10 @@ var stripe = require('../modules/stripe-module.js');
 module.exports = function(app) {    
     app.post('/api/stripe/:acctid/token', function(req, res){                        
       stripe.createCustomer(req.body.stripeToken,req.params.acctid, function(err, result){
-          if(err) res.status(500).send(err)
+          if(err) {
+              console.log('createCustomer Error', err)
+              res.status(500).send(err)
+          }
           else res.status(200).send(result)
       })        
     });

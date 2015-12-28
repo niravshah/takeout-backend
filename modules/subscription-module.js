@@ -35,8 +35,10 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                 if(user.length) {
                     console.log('Existing User:', user[0].accountId);
                     var token = jwt.sign(user, config.secret, {expiresIn: 86400});
-                    user[0].token = token
-                    resCallback(user[0])
+                    var us = {}
+                    us.user = user[0]
+                    us.token = token
+                    resCallback(us)
                 } else {
                     var newUser = User({
                         personName: userProps.personName,
@@ -48,7 +50,8 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                         valid_till_y:null,
                         connected:false,
                         new: true,
-                        verified: false,
+                        payment_verified: false,
+                        phone_verified: false,
                         gcm: '',
                         rgcm: '',
                         password:'',
@@ -60,8 +63,11 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                         updateGCMFromRedis(userProps.accountId);
                         updateRGCMFromRedis(userProps.accountId);
                         var token = jwt.sign(user, config.secret, {expiresIn: 86400});
-                        newUsr[0].token = token                        
-                        resCallback(newUsr[0])
+                        var us = {}
+                        us.user = user[0]
+                        us.token = token
+                        resCallback(us)                        
+                        
                     }).
                     catch(function(err) {if(err) throw err});
                 }
@@ -165,6 +171,7 @@ exports.updatePassword = function(aId, password){
                     var hash = bcrypt.hashSync(password, salt);                    
                     users[0].password = hash;
                     users[0].active = true;
+                    users[0].new = false;
                     users[0].saveAsync().then(function(res){console.log('Updated!', res)}).catch(function(err) {console.log('Error', err)});
                 }}).catch(function(err){console.log('User Find Error',err)})
         }

@@ -4,6 +4,7 @@ var aSync = require('async');
 var User = require('./../models/user');
 var Customer = require('./../models/customer');
 exports.createCustomer = function(stripeToken, accountId, rC) {
+    console.log('createCustomer',stripeToken)
     stripe.customers.create({
         source: stripeToken,
         description: accountId
@@ -13,7 +14,7 @@ exports.createCustomer = function(stripeToken, accountId, rC) {
             accountId: accountId
         }).then(function(users) {
             if(users.length) {
-                users[0].active = true;
+                users[0].payment_verified = true;
                 users[0].valid_till_m = customer.sources.data[0].exp_month;
                 users[0].valid_till_y = customer.sources.data[0].exp_year;
                 users[0].saveAsync().then(function(savedUser) {
@@ -24,7 +25,7 @@ exports.createCustomer = function(stripeToken, accountId, rC) {
                         saccountId: null
                     });
                     newCustomer.saveAsync().then(function(newCustomer) {
-                        rC(null, savedUser)
+                        rC(null, newCustomer[0])
                     }).
                     catch(function(err) {
                         rC(new Error('Error saving Customer'), null);
@@ -37,6 +38,7 @@ exports.createCustomer = function(stripeToken, accountId, rC) {
         });
     }).
     catch(function(err) {
+        console.log(err);
         rC(new Error('Stripe Customer Create Error'), null);
     });
 }
