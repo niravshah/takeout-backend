@@ -21,7 +21,11 @@ var userSchema = new Schema({
   location: String,
   password: String,
   defaultService:String,
-  defaultServiceName:String
+  defaultServiceName:String,
+  stripe_connected:Boolean,    
+  stripe_active:Boolean,
+  stripe_account:String,
+  phone:String
 });
 
 var User = mongoose.model('User', userSchema);

@@ -22,33 +22,42 @@ exports.sendVerificationCode = function(userid, toNumber, rC) {
                     console.log('Errr!');
                 }
             });
+            var key = 'pnumber:' + userid
+            rediscli.set(key, toNumber);
+            console.log(responseData)
             rC(responseData)
         } else {
+            console.log('Error', err)
             rC(err)
         }
     });
 }
 exports.verifyCode = function(userid, code, rC) {
     var key = 'twilio:' + userid
+    var key2 = 'pnumber:' + userid
     rediscli.get(key, function(err, result) {
         if(code == result) {
             User.findAsync({
                 accountId: userid
             }).then(function(users) {
                 if(users.length) {
-                    console.log('verifyCode: User Found');
-                    users[0].verified = true;
-                    users[0].saveAsync().then(function(res) {
-                        console.log('User Verified!', res);
-                        rediscli.del(key, function(err, results) {
-                            console.log('Code Verified!');
-                            rC('Code Verified!');
+                    rediscli.get(key2, function(err, result) {
+                        console.log('verifyCode: User Found');
+                        users[0].phone_verified = true;
+                        user[0].phone = result;
+                        users[0].saveAsync().then(function(res) {
+                            console.log('User Verified!', res);
+                            rediscli.del(key, function(err, results) {
+                                console.log('Code Verified!');
+                                rC('Code Verified!');
+                            });
+                            rediscli.del(key2);
+                        }).
+                        catch(function(err) {
+                            console.log('User Save Error', err)
+                            rC('Code Verification Error!');
                         });
-                    }).
-                    catch(function(err) {
-                        console.log('User Save Error', err)
-                        rC('Code Verification Error!');
-                    });
+                    })
                 } else {
                     console.log('User Not Found', users);
                     rC('Code Verification Error!');

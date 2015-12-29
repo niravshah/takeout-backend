@@ -15,10 +15,15 @@ module.exports = function(app) {
       })        
     });
     
-     app.get('/api/stripe/connect/:acctId/new',function(req,res){            
-        stripe.createNewStandaloneAccount(req.params.acctId, 'nirav.n@gs.com', function(err, result){
-            if(err) res.status(500).send(err)
-            else res.status(200).send(result)
+     app.post('/api/stripe/connect/:acctId/new',function(req,res){            
+        stripe.createNewStandaloneAccount(req.params.acctId, req.body.email, function(err, result){
+            if(err){
+                res.status(err.status).send(err.message)
+            }
+            else{
+                console.log('Result', result)
+                res.status(200).send(result)
+            }
         })    
     });
     
@@ -28,6 +33,12 @@ module.exports = function(app) {
             else res.status(200).send(result)
         })        
     });
+    
+    app.post('/api/webhook/stripe',function(req,res){        
+        var event_json = req.body;
+        stripe.processWebhook(event_json)
+        res.status(200).send();
+    });    
     
    
 }

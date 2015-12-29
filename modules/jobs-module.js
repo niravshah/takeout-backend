@@ -127,7 +127,7 @@ exports.findPaymentPendingJobsByRequester = function(requester,callback){
             var results = jobs.map(function(job){
                 return {jobId:job.jobId,currentStatus:job.currentStatus, address: job.address, date: job.created,servicedby:job.sid.personName, sid:job.sid.accountId,sphoto:job.sid.personPhoto}
             })            
-            //console.log('findPaymentPendingJobsByRequester', results)
+            console.log('findPaymentPendingJobsByRequester', results)
             callback(null,results)
         }else{
             console.log('No Jobs found')

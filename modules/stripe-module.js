@@ -1,8 +1,12 @@
 var exports = module.exports = {};
+var createError = require('http-errors');
+
 var stripe = require("stripe")("sk_test_aTh0omXn80N08tMdm2UKpyrC");
 var aSync = require('async');
 var User = require('./../models/user');
 var Customer = require('./../models/customer');
+
+
 exports.createCustomer = function(stripeToken, accountId, rC) {
     console.log('createCustomer',stripeToken)
     stripe.customers.create({
@@ -44,39 +48,53 @@ exports.createCustomer = function(stripeToken, accountId, rC) {
     });
 }
 exports.createNewStandaloneAccount = function(accountId, email, rC) {
+    console.log(accountId,email)
+    
+    var account = "{id:'acct_17NNWSIGpyMcxPEe',object:'account',business_logo:null,business_name:null,business_url:null,charges_enabled:true,country:'GB',currencies_supported:['usd','aed','afn','all','vuv','wst','xaf','xcd','xof','xpf','yer','zar','zmw'],default_currency:'gbp',details_submitted:false,display_name:null,email:'gdn.amigo@gmail.com',keys:{secret:'sk_test_gU9TMoJzJ64F3HKn0ByZYI40',publishable:'pk_test_h2OQQUMGP5Na0ifPWiMn6B0F'},managed:false,metadata:{},statement_descriptor:null,support_phone:null,timezone:'Etc/UTC',  transfers_enabled: false }"
+     rC(null, account)
+    /*
     stripe.accounts.create({
         managed: false,
         country: 'GB',
         email: email
     }).then(function(account) {
+        console.log(account)
         User.findAsync({
             accountId: accountId
         }).then(function(users) {
             if(users.length) {
-                users[0].connected = true;
+                users[0].stripe_connected = true;
+                users[0].stripe_account=account.id;
                 users[0].saveAsync().then(function(savedUser) {
                     var newCustomer = Customer({
                         accountId: accountId,
-                        saccountId: account.id,
+                        saccountid: account.id,
                         customerId: null,
                         sourceId: null
                     });
                     newCustomer.saveAsync().then(function(newCustomer) {
-                        rC(null, savedUser)
+                        rC(null, account)
                     }).
                     catch(function(err) {
+                        console.log('Error')
                         rC(new Error('Error saving Customer'), null);
                     })
                 })
             }
         }).
         catch(function(err) {
+            console.log(err)
             rC(new Error('Error Updating User'), null)
         });
     }).
     catch(function(err) {
-        rC(new Error('Stripe Create Standalone Account Error'), null)
-    });
+        console.log(err)
+        if(err.statusCode == 400){
+            rC(createError(400, err.message), null)
+        }else{
+            rC(new Error('Stripe Create Standalone Account Error'), null)
+        }
+    });*/
 }
 exports.chargeCustomer = function(custAcctId, amt, curr, recieverAcctId, rC) {
     
@@ -124,4 +142,8 @@ exports.chargeCustomer = function(custAcctId, amt, curr, recieverAcctId, rC) {
             rC(new Error('Error Processing Charge'), null)
         });
     });
+}
+
+exports.processWebhook = function(event_json){
+    console.log(event_json.data.object.verification);
 }

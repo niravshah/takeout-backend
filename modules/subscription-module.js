@@ -55,7 +55,11 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                         rgcm: '',
                         password: '',
                         defaultService: 's1',
-                        defaultServiceName: 'Takeaway Delivery'
+                        defaultServiceName: 'Takeaway Delivery',
+                        stripe_connected:false,
+                        stripe_active:false,
+                        stripe_account:null,
+                        phone:''
                     });
                     console.log('Saving New User')
                     newUser.saveAsync().then(function(newUsr) {
@@ -122,9 +126,9 @@ var updateGCMFromRedis = function(aId) {
                 if(users.length) {
                     console.log('GCM update: User Found');
                     users[0].gcm = '"' + result + '"';
-                    console.log('Saving User', users[0])
+                    console.log('Saving User', users[0].accountId)
                     users[0].saveAsync().then(function(res) {
-                        console.log('GCM ID Updated!', res)
+                       // console.log('GCM ID Updated!', res)
                     }).
                     catch(function(err) {
                         console.log('User Save Error', err)
@@ -153,9 +157,9 @@ var updateRGCMFromRedis = function(aId) {
                 if(users.length) {
                     console.log('rGCM update: User Found');
                     users[0].rgcm = '"' + result + '"';
-                    console.log('Saving User', users[0])
+                    console.log('Saving User', users[0].accountId)
                     users[0].saveAsync().then(function(res) {
-                        console.log('rGCM ID Updated!', res)
+                        //console.log('rGCM ID Updated!', res)
                     }).
                     catch(function(err) {
                         console.log('User Save Error', err)
@@ -188,7 +192,7 @@ exports.updatePassword = function(aId, password, personName) {
                     users[0].new = false;
                     if(personName != null) users[0].personName = personName;
                     users[0].saveAsync().then(function(res) {
-                        console.log('Updated!', res)
+                        //console.log('Updated!', res)
                     }).
                     catch(function(err) {
                         console.log('Error', err)
@@ -208,7 +212,7 @@ exports.updateImage = function(aId, personPhoto) {
         if(users.length) {
             users[0].personPhoto = personPhoto;
             users[0].saveAsync().then(function(res) {
-                console.log('Updated!', res)
+                //console.log('Updated!', res)
             }).
             catch(function(err) {
                 console.log('Error', err)
