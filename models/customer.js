@@ -9,7 +9,7 @@ var customerSchema = new Schema({
     accountId:String,
     customerId:String,
     sourceId:String,
-    saccountid:String
+    saccountId:String
 });
 
 var Customer = mongoose.model('Customer', customerSchema);

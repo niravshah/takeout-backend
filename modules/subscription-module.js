@@ -58,7 +58,7 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                         defaultServiceName: 'Takeaway Delivery',
                         stripe_connected:false,
                         stripe_active:false,
-                        stripe_account:null,
+                        stripe_account:'',
                         phone:''
                     });
                     console.log('Saving New User')

@@ -57,7 +57,7 @@ exports.newJob = function(requester_id, pickup_latd, pickup_lngd, drop_latd, dro
 }
 
 exports.acceptJob = function(jobid,ninjaid, callback){
-    //console.log('acceptJob',jobid,global[jobid],global)
+    console.log('acceptJob',jobid,global[jobid],global)
     jfsm.accept(global[jobid])
     callback({msg:'job_accepted'});
 }

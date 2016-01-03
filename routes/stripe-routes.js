@@ -27,8 +27,8 @@ module.exports = function(app) {
         })    
     });
     
-    app.get('/api/stripe/charge/:cust_acctid/:amt/:curr/:reciever_acctid',function(req,res){        
-        stripe.chargeCustomer(req.params.cust_acctid,req.params.amt,req.params.curr, req.params.reciever_acctid, function(err, result){
+    app.post('/api/stripe/charge/:cust_acctid/:amt/:curr/:reciever_acctid',function(req,res){
+        stripe.chargeCustomer(req.params.cust_acctid,req.params.amt,req.params.curr, req.params.reciever_acctid, req.body.jobIds, function(err, result){
             if(err) res.status(500).send(err)
             else res.status(200).send(result)
         })        

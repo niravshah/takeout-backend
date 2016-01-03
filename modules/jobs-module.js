@@ -92,7 +92,7 @@ exports.findJobsByRequesterId = function(requester,callback){
            callback(null,jobs)
         }else{
             console.log('No Live Jobs found')
-            callback(null,{})
+            callback(null,[])
         }
     }).catch(function(err) {
          callback(err,null)
@@ -131,7 +131,7 @@ exports.findPaymentPendingJobsByRequester = function(requester,callback){
             callback(null,results)
         }else{
             console.log('No Jobs found')
-            callback(null,{})
+            callback(null,[])
         }     
     })
 }
@@ -145,7 +145,7 @@ exports.findJobsByServicer = function(requester,callback){
            callback(null,jobs)
         }else{
             console.log('No Live Jobs found')
-            callback(null,{})
+            callback(null,[])
         }
     }).catch(function(err) {
          callback(err,null)
@@ -177,7 +177,7 @@ exports.findPaymentPendingJobsByServicer = function(servicer,callback){
            callback(null,jobs)
         }else{
             console.log('No Jobs found')
-            callback(null,{})
+            callback(null,[])
         }
     }).catch(function(err) {
          callback(err,null)
@@ -197,7 +197,7 @@ exports.findJobsByAssigneeAndStatus = function(asignee,status,callback){
            callback(null,jobs)
         }else{
             console.log('No Jobs found')
-            callback(null,{})
+            callback(null,[])
         }
     }).catch(function(err) {
          callback(err,null)

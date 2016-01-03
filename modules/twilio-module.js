@@ -5,6 +5,8 @@ var chance = new Chance();
 var twilio_number = '441202835085';
 var redis = require("redis");
 var rediscli = redis.createClient();
+var User = require('./../models/user');
+
 exports.sendVerificationCode = function(userid, toNumber, rC) {
     var code = chance.natural({
         min: 1000,
@@ -44,28 +46,28 @@ exports.verifyCode = function(userid, code, rC) {
                     rediscli.get(key2, function(err, result) {
                         console.log('verifyCode: User Found');
                         users[0].phone_verified = true;
-                        user[0].phone = result;
+                        users[0].phone = result;
                         users[0].saveAsync().then(function(res) {
                             console.log('User Verified!', res);
                             rediscli.del(key, function(err, results) {
                                 console.log('Code Verified!');
-                                rC('Code Verified!');
+                                rC(null,{msg:'Code Verified!'});
                             });
                             rediscli.del(key2);
                         }).
                         catch(function(err) {
                             console.log('User Save Error', err)
-                            rC('Code Verification Error!');
+                            rC(new Error('Code Verification Error!'),null)
                         });
                     })
                 } else {
                     console.log('User Not Found', users);
-                    rC('Code Verification Error!');
+                    rC(new Error('Code Verification Error!'),null);
                 }
             });
         } else {
             console.log('Result Not Found', result)
-            rC('Code Verification Error!');
+            rC(new Error('Code Verification Error!'), null);
         }
     });
 }
