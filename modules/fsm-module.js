@@ -10,6 +10,7 @@ var bluebird = require("bluebird");
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 var rediscli = redis.createClient();
+var Chance = require('chance');
 
 exports.jFSM = machina.BehavioralFsm.extend( {
     namespace: "jobs-fsm",
@@ -54,10 +55,12 @@ exports.jFSM = machina.BehavioralFsm.extend( {
              _onEnter: function(job) {
                  console.log(job.id + ' : contactNinja _onEnter : Calling :',job.currentNinja);   
                  jobs.updateJobStatus(job.key, 'looking_for_amigos');
-                 nJ.requestPickup(job.key);
+                 job.notsid =  Chance.integer({min: 0});
+                 nJ.requestPickup(job.key, job.notsid);
                  job.timer = setTimeout( function() {
                      console.log("Timeout",job.id)
                      job.isTimeout = true;
+                     nJ.unRequestPickup(job.currentNinja, job.notsid);
                      this.handle(job, "timeout" );
                  }.bind( this ), 30000 );                 
             },

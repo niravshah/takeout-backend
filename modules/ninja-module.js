@@ -179,14 +179,14 @@ exports.findNinjaNearby = function(service, pickup_latd, pickup_lngd, finalCallb
         }
     ]);
 }
-exports.requestPickup = function(jobkey) {
+exports.requestPickup = function(jobkey, notsid) {
     var key = jobkey + ":ninja:current"
     rediscli.getAsync(key).then(function(result) {
         var gcmKey = "gcm:" + result;
         rediscli.getAsync(gcmKey).then(function(result) {
             console.log('Requesting Pickup for: ' + jobkey + ': from :' + result + " : " + key + ": gcm : " + result + " : gcmKey : " + gcmKey);
             rediscli.getAsync(jobkey).then(function(jobDetails) {
-                nots.sendNotification(result, jobDetails)
+                nots.sendNotification(result, jobDetails,notsid)
             }).
             catch(function(err) {
                 console.log('ERROR:', err)
@@ -200,6 +200,14 @@ exports.requestPickup = function(jobkey) {
         console.log('ERROR - requestPickup', err)
     });
 }
+
+exports.unRequestPickup = function(ninjaid, notsid){
+    var gcmKey = "gcm:" + ninjaid;
+    rediscli.getAsync(gcmKey).then(function(result) {        
+        sendCancelNotification(result,notsid);        
+    }).catch(function(err){})
+};
+
 exports.notifyJobRejected = function(requester_id, jobkey) {
     var gcmKey = "rgcm:" + requester_id;
     rediscli.getAsync(gcmKey).then(function(result) {

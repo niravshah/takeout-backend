@@ -4,7 +4,7 @@ var Chance = require('chance');
 var partner_sender = new gcm.Sender('AIzaSyAvV7P84-Y5ixZIxuB2RP590R2bBUPaRQI');
 var customer_sender = new gcm.Sender('AIzaSyDkGF_h3MydOEmWnJUcR-1pYQbOiEMFxCU');
 
-var sendNotification = function(gcm_id,message, sender){
+var sendNotif = function(gcm_id,message, sender){
   var notsId = Chance.integer({min: 0});
   message.addData('notsId',notsId);
   var registrationTokens = [];
@@ -23,7 +23,7 @@ exports.notifyJobRejected = function(gcm_id,details) {
   message.addData('details', details);
   message.addData('type','JOB');
   message.addNotification('message', 'Sorry. Cant service this job right now.');
-  sendNotification(gcm_id,message, customer_sender)
+  sendNotif(gcm_id,message, customer_sender)
 }
 
 exports.notifyJobAccepted= function(gcm_id,details) {
@@ -32,7 +32,7 @@ exports.notifyJobAccepted= function(gcm_id,details) {
   message.addData('details', details);
   message.addData('type','JOB');
   message.addNotification('message', 'Job Accepted!');  
-  sendNotification(gcm_id,message, customer_sender)
+  sendNotif(gcm_id,message, customer_sender)
 }
 
 exports.sendCustomerNotification= function(gcm_id,details) {
@@ -40,7 +40,7 @@ exports.sendCustomerNotification= function(gcm_id,details) {
   message.addData('details', details);
   message.addData('type', 'PAYMENT');
   message.addNotification('message', 'Thanks. Payment has been processed.');  
-  sendNotification(gcm_id,message, customer_sender)
+  sendNotif(gcm_id,message, customer_sender)
 }
 
 exports.sendRecieverNotification = function(gcm_id,details) {
@@ -48,14 +48,26 @@ exports.sendRecieverNotification = function(gcm_id,details) {
   message.addData('details', details);
   message.addData('type', 'PAYMENT');
   message.addNotification('message', 'A new Payment has been recieved!');
-  sendNotification(gcm_id,message,partner_sender);
+  sendNotif(gcm_id,message,partner_sender);
 }
 
-exports.sendNotification = function(gcm_id,details) {
+exports.sendNotification = function(gcm_id,details,notsid) {
   console.log('sendNotification', details)
   var message = new gcm.Message();
   message.addData('details', details);
   message.addData('type','JOB');
+  message.addData('notsId',notsid);
   message.addNotification('message', 'A new Job is available!');
-  sendNotification(gcm_id,message,partner_sender);
+  sendNotif(gcm_id,message,partner_sender);
 }
+
+exports.sendCancelNotification = function(gcm_id,notsid) {
+  console.log('sendCancelNotification', details)
+  var message = new gcm.Message();
+  message.addData('details', "");
+  message.addData('type','JOB');
+  message.addData('notsId',notsid);
+  message.addData('action',"cancel");
+  sendNotif(gcm_id,message,partner_sender);
+}
+

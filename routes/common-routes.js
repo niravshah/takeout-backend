@@ -2,20 +2,7 @@ var subscription = require('./../modules/subscription-module.js');
 var notify = require('./../modules/notifications-module.js');
 var User = require('./../models/user');
 
-module.exports = function(app) {
-  
-  app.get('/api/notify/:id', function(req, res) {
-    User.find({
-      accountId: req.params.id
-    }, function(err, users) {
-      if(users.length) {
-        notify.sendNotification(users[0].gcm.replace(/['"]+/g, ''))
-        res.status(200).send('Notification Sent to: ', users[0].gcm.replace(/['"]+/g, ''));
-      } else {
-        res.status(404).send('User Not Found: ', req.params.id);
-      }
-    });
-  });
+module.exports = function(app) {  
   
   app.post('/api/gcm', function(req, res) {
     //console.log('GCM Token', req.body)
