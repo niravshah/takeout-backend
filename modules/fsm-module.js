@@ -22,28 +22,19 @@ exports.jFSM = machina.BehavioralFsm.extend( {
                     
                     job.currentNinja = job.list[0].key                
                     console.log(job.id + ' : checkoutCurrentNinja _onEnter : Calling :',job.currentNinja);  
-                    var listKey = "ninja:available:" + job.service + ":" + job.grid
-                    var ninjaKey = "ninja:" + job.currentNinja + ":location"
-                    rediscli.sremAsync(listKey,ninjaKey).then(function(res){
-                        console.log(job.id + ' : SREM result', res);
-                        if(res==1){
-                            var key2 = job.key + ":ninja:current";
-                            rediscli.set(key2, job.currentNinja , function(err, res) {
-                                if(err){
-                                    console.log('ERROR - Setting Current Ninja to Redis:', err);
-                                    this.handle(job,"reset");                                                                        
-                                }else{ 
-                                    console.log("Current Ninja Set", res);
-                                    this.handle(job,"contactNinja");
-                                }
-                            }.bind(this));                        
-                        }else{
-                            this.handle(job,"reset")
+                    
+                    nJ.markNinjaUnavailable(job.currentNinja,job.service);
+                    var key2 = job.key + ":ninja:current";
+                    rediscli.set(key2, job.currentNinja , function(err, res) {
+                        if(err){
+                            console.log('ERROR - Setting Current Ninja to Redis:', err);                                    
+                            this.handle(job,"reset");                                                                        
+                        }else{ 
+                            console.log("Current Ninja Set", res);
+                            this.handle(job,"contactNinja");
                         }
-                    }.bind(this)).catch(function(err){
-                        console.log(job.id + ' : SREM error', listKey,ninjaKey,err)
-                        this.handle(job,"terminateJob");
-                    }.bind(this))
+                    }.bind(this));                    
+                    
                 }else{
                     this.handle(job,"terminateJob")
                 }
@@ -64,9 +55,9 @@ exports.jFSM = machina.BehavioralFsm.extend( {
                  console.log(job.id + ' : contactNinja _onEnter : Calling :',job.currentNinja);   
                  jobs.updateJobStatus(job.key, 'looking_for_amigos');
                  nJ.requestPickup(job.key);
-                 nJ.updateNinjaStatus(job.currentNinja,job.service,'unavailable');
                  job.timer = setTimeout( function() {
                      console.log("Timeout",job.id)
+                     job.isTimeout = true;
                      this.handle(job, "timeout" );
                  }.bind( this ), 30000 );                 
             },
@@ -79,10 +70,14 @@ exports.jFSM = machina.BehavioralFsm.extend( {
         },
         jobRejected: {
             _onEnter:function(job){           
-                var listKey = "ninja:available:" + job.service + ":" + job.grid
-                var ninjaKey = "ninja:" + job.currentNinja + ":location"
-                rediscli.saddAsync(listKey,ninjaKey).then(function(res){}).catch(function(err){})        
-                nJ.updateNinjaStatus(job.currentNinja,job.service,'available');
+                var listKey = "ninja:available:" + job.service + ":" + job.grid;
+                var ninjaKey = "ninja:" + job.currentNinja + ":location";
+                if(!job.isTimeout){
+                    nJ.markNinjaAvailable(job.currentNinja,job.service);
+                }else{
+                    job.isTimeout = false;
+                    nJ.updateStrikesAndStatus(job.currentNinja,job.service);
+                }
                 
                 console.log(job.id + ' : ninjaRejected',job.currentNinja);
                 if(job.list.length > 0){

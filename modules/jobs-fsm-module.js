@@ -20,7 +20,7 @@ exports.newJob = function(requester_id, pickup_latd, pickup_lngd, drop_latd, dro
     var jobId = shortid.generate();
     var key = "job:" + requester_id + ":" + jobId;
 
-    var job = {id : jobId, key:key, pickup_latd:pickup_latd,pickup_lngd:pickup_lngd, service:service, grid:'',list:'',requester_id:requester_id}
+    var job = {id : jobId, key:key, pickup_latd:pickup_latd,pickup_lngd:pickup_lngd, service:service, grid:'',list:'',requester_id:requester_id, isTimeout:false}
     jobs.createNewJob(jobId, key, requester_id, pickup_latd, pickup_lngd, drop_latd, drop_lngd, service,deliveryAddress);
     aSync.waterfall([
         function(callback) {
@@ -70,12 +70,8 @@ exports.rejectJob = function(jobid,ninjaid, callback){
 exports.completeJob = function(jobid,ninjaid, callback){
     //console.log('completeJob',jobid,global[jobid],global)
     var job = global[jobid];
-    jobs.updateJobStatus(job.key, 'payment_pending');
-    nJ.updateNinjaStatus(job.currentNinja,job.service,'available');
-    
-    var listKey = "ninja:available:" + job.service + ":" + job.grid
-    var ninjaKey = "ninja:" + job.currentNinja + ":location"    
-    rediscli.sadd(listKey,ninjaKey,function(err,res){});
+    jobs.updateJobStatus(job.key, 'payment_pending');       
+    nJ.markNinjaAvailable(job.currentNinja,job.service);   
     delete global[jobid]
     callback({msg:'job_marked_complete'});
 }
