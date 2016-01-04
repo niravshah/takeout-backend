@@ -50,6 +50,7 @@ var serviceRoutes = require('./routes/service-routes.js')(app);
 var twilioRoutes = require('./routes/twilio-routes.js')(app);
 var postcodeRoutes = require('./routes/postcode-routes.js')(app);
 var stripeRoutes = require('./routes/stripe-routes.js')(app);
+var ratingsRoutes = require('./routes/ratings-routes.js')(app);
 
 
 app.get('/api', function(req, res) {

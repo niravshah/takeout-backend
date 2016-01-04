@@ -91,7 +91,8 @@ exports.updateStrikesAndStatus = function(ninjaid, service) {
     var status_key = "ninja:" + ninjaid + ":" + service + ":status";
     
     rediscli.incrAsync(strike_key).then(function(value){
-        if(val>=3){            
+        
+        if(value>=3){            
             markNinjaUnavailable(ninjaid,service);
         }else{
             markNinjaAvailable(ninjaid,service);
