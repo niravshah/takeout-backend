@@ -1,11 +1,12 @@
 var exports = module.exports = {};
 var gcm = require('node-gcm');
 var Chance = require('chance');
+var chance = new Chance();
 var partner_sender = new gcm.Sender('AIzaSyAvV7P84-Y5ixZIxuB2RP590R2bBUPaRQI');
 var customer_sender = new gcm.Sender('AIzaSyDkGF_h3MydOEmWnJUcR-1pYQbOiEMFxCU');
 
 var sendNotif = function(gcm_id,message, sender){
-  var notsId = Chance.integer({min: 0});
+  var notsId = chance.integer({min: 0});
   message.addData('notsId',notsId);
   var registrationTokens = [];
   registrationTokens.push(gcm_id);
@@ -13,7 +14,7 @@ var sendNotif = function(gcm_id,message, sender){
     registrationTokens: registrationTokens
   }, function(err, response) {
     if(err) console.error('Error', err);
-    else console.log('response',response);
+    else console.log('response',response.results);
   });   
 }
 

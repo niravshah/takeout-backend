@@ -40,17 +40,38 @@ app.use('/api/stripe',function(req, res, next) {
   }
 });
 
+var bunyan = require('bunyan');
+var log = bunyan.createLogger({
+    name: 'presto',
+    streams: [
+        {
+            type: 'rotating-file',
+            path: '/home/codio/workspace/logs/presto-log.log',
+            period: '1d', 
+            count: 3     
+        },        
+        {
+            type: "raw",
+            stream: require('bunyan-logstash').createStream({
+                host: '127.0.0.1',
+                port: 5505
+            })
+        }
+    ]
+});
+
+
 
 var commonRoutes = require('./routes/common-routes.js')(app);
 var ninjaRoutes = require('./routes/ninja-routes.js')(app);
 var gridRoutes = require('./routes/grid-routes.js')(app);
 var jobRoutes = require('./routes/job-routes.js')(app);
-var jobFsmRoutes = require('./routes/jobs-fsm-routes.js')(app);
+var jobFsmRoutes = require('./routes/jobs-fsm-routes.js')(app,log);
 var serviceRoutes = require('./routes/service-routes.js')(app);
 var twilioRoutes = require('./routes/twilio-routes.js')(app);
 var postcodeRoutes = require('./routes/postcode-routes.js')(app);
 var stripeRoutes = require('./routes/stripe-routes.js')(app);
-var ratingsRoutes = require('./routes/ratings-routes.js')(app);
+var ratingsRoutes = require('./routes/ratings-routes.js')(app,log);
 
 
 app.get('/api', function(req, res) {

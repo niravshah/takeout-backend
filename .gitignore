@@ -1,3 +1,5 @@
 nw.csv
 /postcodes/*
 /node_modules/*
+/logs
+/es

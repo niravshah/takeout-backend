@@ -11,6 +11,7 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 var rediscli = redis.createClient();
 var Chance = require('chance');
+var chance = new Chance();
 
 exports.jFSM = machina.BehavioralFsm.extend( {
     namespace: "jobs-fsm",
@@ -55,9 +56,10 @@ exports.jFSM = machina.BehavioralFsm.extend( {
              _onEnter: function(job) {
                  console.log(job.id + ' : contactNinja _onEnter : Calling :',job.currentNinja);   
                  jobs.updateJobStatus(job.key, 'looking_for_amigos');
-                 job.notsid =  Chance.integer({min: 0});
+                 job.notsid =  chance.integer({min: 0});
                  nJ.requestPickup(job.key, job.notsid);
                  job.timer = setTimeout( function() {
+                     job.logger.info({jobid:job.id,event:'timeout',ninja:job.currentNinja}, "Ninja Rejected")
                      console.log("Timeout",job.id)
                      job.isTimeout = true;
                      nJ.unRequestPickup(job.currentNinja, job.notsid);
@@ -94,13 +96,14 @@ exports.jFSM = machina.BehavioralFsm.extend( {
         },
         jobTerminated : {
             _onEnter:function(job){                
+                job.logger.info({jobid:job.id,event:'terminated'}, "Job Terminated")
                 jobs.updateJobStatus(job.key, 'no_amigo_available');
                 nJ.notifyJobRejected(job.requester_id,job.key);
                 console.log('Cant find any more Ninjas! Exiting',job.id)
             }
         },
         jobAccepted: {
-            _onEnter:function(job){ 
+            _onEnter:function(job){                 
                 jobs.updateJobStatus(job.key, 'in_progress');
                 jobs.assignJob(job.key,job.currentNinja);
                 jobs.updateJobServicedBy(job.key,job.currentNinja);
@@ -109,7 +112,9 @@ exports.jFSM = machina.BehavioralFsm.extend( {
             }
         }
     },
-    newJob: function(job) {
+    newJob: function(job, logger) {
+        logger.info({jobid:job.id,event:'start'}, "Starting new Job")
+        job.logger = logger;
         this.handle(job, "start");
     },
     accept: function(job){
