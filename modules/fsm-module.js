@@ -59,7 +59,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
                  job.notsid =  chance.integer({min: 0});
                  nJ.requestPickup(job.key, job.notsid);
                  job.timer = setTimeout( function() {
-                     job.logger.info({jobid:job.id,event:'timeout',ninja:job.currentNinja}, "Ninja Rejected")
+                     this.logger.info({jobid:job.id,event:'timeout',ninja:job.currentNinja}, "Ninja Rejected")
                      console.log("Timeout",job.id)
                      job.isTimeout = true;
                      nJ.unRequestPickup(job.currentNinja, job.notsid);
@@ -96,7 +96,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
         },
         jobTerminated : {
             _onEnter:function(job){                
-                job.logger.info({jobid:job.id,event:'terminated'}, "Job Terminated")
+                this.logger.info({jobid:job.id,event:'terminated'}, "Job Terminated")
                 jobs.updateJobStatus(job.key, 'no_amigo_available');
                 nJ.notifyJobRejected(job.requester_id,job.key);
                 console.log('Cant find any more Ninjas! Exiting',job.id)
@@ -114,7 +114,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
     },
     newJob: function(job, logger) {
         logger.info({jobid:job.id,event:'start'}, "Starting new Job")
-        job.logger = logger;
+        this.logger = logger;
         this.handle(job, "start");
     },
     accept: function(job){

@@ -8,8 +8,8 @@ module.exports = function(app, logger) {
     app.post('/api/job/:service/:requester_id/:pickup_latd/:pickup_lngd/:drop_latd/:drop_lngd', function(req, res) {
         fsm.newJob(req.params.requester_id, req.params.pickup_latd, req.params.pickup_lngd, req.params.drop_latd, req.params.drop_lngd, req.params.service, req.body.deliveryAddress, function(result) {
             jFL.info({jobid:result.id, event:'new', result:result},'New Job Created')
-            //res.status(200).send(result)
-            res.status(200).send({message:'success'})
+            res.status(200).send(result)
+            //res.status(200).send({message:'success'})
         });
     });
 

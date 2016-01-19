@@ -449,6 +449,14 @@ fieldset[disabled] .btn-primary.active {
     padding: 15px 30px;
 }
 
+.btn-sm {
+    border: 0;
+    border-radius: 0px;   
+    text-transform: uppercase;
+    font-family: 'Open Sans','Helvetica Neue',Arial,sans-serif;
+    font-weight: 300;
+}
+
 ::-moz-selection {
     text-shadow: none;
     color: #fff;
