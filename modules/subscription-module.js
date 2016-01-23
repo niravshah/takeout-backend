@@ -55,7 +55,7 @@ exports.validateTokenFromGoogle = function(src, token, userProps, errCallback, r
                         rgcm: '',
                         password: '',
                         defaultService: 's1',
-                        defaultServiceName: 'Takeaway Delivery',
+                        defaultServiceName: 'Food Delivery',
                         stripe_connected:false,
                         stripe_active:false,
                         stripe_account:'',

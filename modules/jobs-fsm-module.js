@@ -47,12 +47,12 @@ module.exports = function(logger) {
                 if(list.length > 1){
                     job.list = list;            
                     job.grid = grid;       
-                    jobs.updateJobStatus(key, 'looking_for_amigos');
+                    jobs.updateJobStatus(key, 'looking_for_drivers');
                     jfsm.newJob(job,logger);
                     global[jobId] = job
                     fcallback(job);    
                 }else{
-                    jobs.updateJobStatus(key, 'no_amigo_available');
+                    jobs.updateJobStatus(key, 'no_driver_available');
                     fcallback(job);  
                 }
             }

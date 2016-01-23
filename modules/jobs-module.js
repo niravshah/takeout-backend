@@ -102,7 +102,7 @@ exports.findJobsByRequesterId = function(requester,callback){
 exports.findLiveJobsByRequesterId = function(requester,callback){
      Job.findAsync({
         requesterId: requester,
-        currentStatus:{ $in: ['new', 'in_progress','looking_for_amigos'] }
+        currentStatus:{ $in: ['new', 'in_progress','looking_for_drivers'] }
     }).then(function(jobs) {
         if(jobs.length){
            callback(null,jobs)
@@ -155,7 +155,7 @@ exports.findJobsByServicer = function(requester,callback){
 exports.findLiveJobsByServicer = function(requester,callback){
      Job.findAsync({
         servicedby: requester,
-        currentStatus:{ $in: ['new', 'in_progress','looking_for_amigos'] }
+        currentStatus:{ $in: ['new', 'in_progress','looking_for_drivers'] }
     }).then(function(jobs) {
         if(jobs.length){
            callback(null,jobs)

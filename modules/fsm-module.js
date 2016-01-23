@@ -55,7 +55,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
         contactNinja: {
              _onEnter: function(job) {
                  console.log(job.id + ' : contactNinja _onEnter : Calling :',job.currentNinja);   
-                 jobs.updateJobStatus(job.key, 'looking_for_amigos');
+                 jobs.updateJobStatus(job.key, 'looking_for_drivers');
                  job.notsid =  chance.integer({min: 0});
                  nJ.requestPickup(job.key, job.notsid);
                  job.timer = setTimeout( function() {
@@ -64,7 +64,7 @@ exports.jFSM = machina.BehavioralFsm.extend( {
                      job.isTimeout = true;
                      nJ.unRequestPickup(job.currentNinja, job.notsid);
                      this.handle(job, "timeout" );
-                 }.bind( this ), 30000 );                 
+                 }.bind( this ), 50000 );                 
             },
             accept: "jobAccepted",
             reject: "jobRejected",

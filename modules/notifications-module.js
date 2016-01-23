@@ -32,7 +32,7 @@ exports.notifyJobAccepted= function(gcm_id,details) {
   var message = new gcm.Message();
   message.addData('details', details);
   message.addData('type','JOB');
-  message.addNotification('message', 'Job Accepted!');  
+  message.addNotification('message', 'Job Accepted');  
   sendNotif(gcm_id,message, customer_sender)
 }
 
