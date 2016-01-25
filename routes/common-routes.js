@@ -1,4 +1,4 @@
-var subscription = require('./../modules/subscription-module.js');
+    var subscription = require('./../modules/subscription-module.js');
 var notify = require('./../modules/notifications-module.js');
 var User = require('./../models/user');
 

@@ -60,13 +60,13 @@
                     <li>
                         <a class="page-scroll" href="#contact">Contact</a>
                     </li>
-                </ul>
+                </ul>               
             </div>
             <div style="float:right;margin:10px;">
-                <a href="#contact" class="btn btn-sm btn-primary">JOIN NOW</a> 
-                <a href="driver-partners.html" class="btn btn-sm btn-primary">JOIN AS DRIVER</a> 
+                <a href="#contact" class="btn btn-sm btn-primary">JOIN NOW</a>     
+                <a href="driver-partners.html" class="btn btn-sm btn-primary">JOIN AS DRIVER</a>     
             </div>
-
+            
             <!-- /.navbar-collapse -->
         </div>
         <!-- /.container-fluid -->
@@ -77,9 +77,8 @@
             <div class="header-content-inner">
                 <h1>on-demand local delivery for your business</h1>
                 <hr>
-                <p>Boost revenue by reaching even more customers through delivery services.
-                    <br/>Deliver Now connects you to drivers available for delivery now in your local area.</p>
-                <a href="#contact" class="btn btn-primary btn-xl page-scroll">JOIN NOW</a> 
+                <p>Boost revenue by reaching even more customers through delivery services.<br/>Deliver Now connects you to drivers available for delivery now in your local area.</p>
+                <a href="#contact" class="btn btn-primary btn-xl page-scroll">JOIN NOW</a>                
             </div>
         </div>
     </header>
@@ -91,7 +90,7 @@
                     <h2 class="section-heading">No More Fixed Delivery Overheads</h2>
                     <hr class="light">
                     <p class="text-faded">With Delivery Now you can request on-demand delivery as and when your orders are ready. You dont need to hire and pay for a fixed delivery driver and vehicle every month.</p>
-                    <a href="#" class="btn btn-default btn-xl">Get Started!</a> 
+                    <a href="#" class="btn btn-default btn-xl">Get Started!</a>                    
                 </div>
             </div>
         </div>
@@ -128,19 +127,19 @@
                         <h3>Simple Billing</h3>
                         <p class="text-muted">No fixed commitments or contracts. We charge 2% of every transaction you make</p>
                     </div>
-                </div>
+                </div>                
                 <div class="col-lg-3 col-md-6 text-center">
                     <div class="service-box">
                         <i class="fa fa-4x fa-gears wow bounceIn text-primary" data-wow-delay=".2s"></i>
                         <h3>Payment Processing</h3>
                         <p class="text-muted">Built in payment system lets you pay drivers in bulk or per delivery using your credit card.</p>
                     </div>
-                </div>
+                </div>               
             </div>
         </div>
     </section>
-
-    <section class="no-padding" id="portfolio">
+    
+     <section class="no-padding" id="portfolio">
         <div class="container-fluid">
             <div class="row no-gutter">
                 <div class="col-lg-4 col-sm-6">
@@ -236,7 +235,7 @@
             </div>
         </div>
     </section>
-
+    
     <section id="contact">
         <div class="container">
             <div class="row">
@@ -246,22 +245,22 @@
                     <p>Leave us your email and we will send you an exclusive invite to the app once we launch</p>
                 </div>
                 <div class="col-lg-8 col-lg-offset-2 text-center">
-                    <form id="contact_form" action="" method="">
+                    <form>
                         <div class="form-group">
                             <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
                         </div>
-                        <button type="button" class="btn btn-primary" onclick="submitSubscribeForm();">Submit</button>
-                    </form>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>                
                 </div>
             </div>
         </div>
-    </section>
+    </section>        
 
-
+   
     <aside class="bg-dark">
         <div class="container text-center">
             <div class="call-to-action">
-                <h2>Deliver Now</h2> 
+                <h2>Deliver Now</h2>                
             </div>
         </div>
     </aside>
@@ -280,25 +279,6 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="js/creative.js"></script>
-
-    <script type="text/javascript">
-        function submitSubscribeForm() {
-            console.log('submitSubscribeForm');
-            var email = $("input#exampleInputEmail1").val();
-            var dataString = 'email='+ email;
-            $.ajax({
-                type: "POST",
-                url: "/api/subscribe",
-                data:dataString,
-                success: function() {
-                    $('#contact_form').html("<div id='message'></div>");
-                    $('#message').html("<h2>Contact Form Submitted!</h2>").append("<p>We will be in touch soon.</p>").hide().fadeIn(1500, function() {
-                        $('#message').append("<img id='checkmark' src='img/check.png' />");
-                    });
-                }
-            });
-        }
-    </script>
 
 </body>
 

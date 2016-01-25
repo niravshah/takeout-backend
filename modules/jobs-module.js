@@ -169,19 +169,27 @@ exports.findLiveJobsByServicer = function(requester,callback){
 }
 
 exports.findPaymentPendingJobsByServicer = function(servicer,callback){
-     Job.findAsync({
+    
+                
+    Job.find({
         servicedby: servicer,
         currentStatus:{ $in: ['payment_pending'] }
-    }).then(function(jobs) {
-        if(jobs.length){
-           callback(null,jobs)
+    }).populate('rid').exec(function(err,jobs){
+        if(err){
+            callback(err,null)
+        }else if(jobs.length){
+            var results = jobs.map(function(job){
+                return {jobId:job.jobId,currentStatus:job.currentStatus, address: job.address, date: job.created, rname:job.rid.personName, rid:job.rid.accountId,rphoto:job.rid.personPhoto}
+            })            
+            console.log('findPaymentPendingJobsByServicer', results)
+            callback(null,results)
         }else{
             console.log('No Jobs found')
             callback(null,[])
         }
-    }).catch(function(err) {
-         callback(err,null)
-     })       
+    });
+
+         
 }
 
 
