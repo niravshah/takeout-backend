@@ -283,9 +283,8 @@
 
     <script type="text/javascript">
         function submitSubscribeForm() {
-            console.log('submitSubscribeForm');
             var email = $("input#exampleInputEmail1").val();
-            var dataString = 'email='+ email;
+            var dataString = 'email='+ email + '&src=bus';
             $.ajax({
                 type: "POST",
                 url: "/api/subscribe",

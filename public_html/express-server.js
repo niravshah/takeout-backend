@@ -1,5 +1,15 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/subscribe');
+
+var subSchema = mongoose.Schema({    
+    email:String,
+    src: String
+});
+
+var Subscription = mongoose.model('Subscription', subSchema);
+
 var app = express();
 
 app.use(bodyParser.urlencoded({
@@ -8,13 +18,22 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
-  res.send('Hello World!');
+    Subscription.find(function(err,subs){
+        res.send(subs);      
+    })
+  
 });
 
 app.post('/subscribe', function(req, res){
     var email = req.body.email;
-    console.log(email)
-    res.send('Thanks!');
+    var src = req.body.src;
+    var newSub = new Subscription({ email: email, src:src });        
+    newSub.save(function (err, sub) {
+        if (err) return console.error(err);
+        console.log('New Sub Created!')    
+        res.send(sub);
+    });
+    
 });
 
 app.listen(3000, function () {
