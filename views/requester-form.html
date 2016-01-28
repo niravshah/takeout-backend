@@ -1,0 +1,87 @@
+{% extends 'layout.html' %} {% block content %}
+<div class="bs-example">
+    <div class="row jumbotron">
+        <div class="col col-md-4">
+            <div class="dropdown">
+                <form action="/pf/providers/market" method="get">
+                    <select id="market">
+                        {% for market in markets %}
+                        <option value="{{market.shortId}}">{{market.shortId}} - {{ market.name}} - {{ market.description}}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm">Get Services</button>
+                </form>
+            </div>
+        </div>
+        <div class="col col-md-4">
+            {% if services.length %}
+            <div class="dropdown">
+                <select id="service">
+                    {% for service in services %}
+                    <option value="{{service.serviceId}}">{{service.serviceId}} - {{ service.serviceName}}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-sm">Get Providers</button>
+            </div>
+            {% endif %}
+
+            <ul>
+                {% for provider in providers %}
+                <li>
+                    {{provider.shortId}} - {{ provider.name}}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-md-6">
+            <form action="/pf/providers/available" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="serviceName">Latitude</label>
+                            <input type="text" class="form-control" name="latitude" id="latitude" placeholder="Service Name">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="serviceName">Longitude</label>
+                            <input type="text" class="form-control" name="longitude" id="longitude" placeholder="Service Name">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="serviceName">ServiceId</label>
+                            <input type="text" class="form-control" name="serviceId" id="serviceId" placeholder="Service Name">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="shortId">Short Id</label>
+                            <input type="text" class="form-control" name="shortId" id="shortId" placeholder="Short Id">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Go Online</button>
+            </form>
+        </div>
+    </div>
+    {% endblock %} {% block customscript %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#serviceId').val($('#service').val());
+            $('#latitude').val(geoplugin_latitude());
+            $('#longitude').val(geoplugin_longitude());
+            $('#service').on('change', function() {
+                $('#serviceId').val(this.value);
+            });
+            $('#market').on('change', function() {
+                $(this.form).attr("action", '/pf/providers/' + this.value);
+            });
+        });
+    </script>
+    {% endblock %}
+

@@ -1,0 +1,47 @@
+{% extends 'layout.html' %} {% block content %}
+<div class="bs-example">
+    <div class="row jumbotron">
+        <div class="col col-md-6">
+            <ul>
+                {% for market in markets %}
+                <li>
+                    {{market.shortId}} - {{ market.name}} - {{ market.description}}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col col-md-6">
+            <form action="/now/markets" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="shortId">Short Id</label>
+                            <input type="text" class="form-control" name="shortId" id="shortId" placeholder="Short Id">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="serviceName">Marketplace Name</label>
+                            <input type="text" class="form-control" name="name" id="serviceName" placeholder="Service Name">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="serviceDescription">Marketplace Description</label>
+                            <input type="text" class="form-control" name="description" id="serviceDescription" placeholder="Description">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

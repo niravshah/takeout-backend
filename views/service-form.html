@@ -1,0 +1,67 @@
+{% extends 'layout.html' %} {% block content %}
+<div class="bs-example">
+    <div class="row jumbotron">
+        <div class="col col-md-6">
+            <ul>
+                {% for service in services %}
+                <li style="padding-top:10px;">
+                    {{service.marketplace.shortId}} - {{service.serviceId}} - {{ service.serviceName}} - {{ service.serviceDescription}}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-md-6">
+            <form action="/now/services/new" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="marketShortId">Marketplace Short Id</label>
+                            <input type="text" class="form-control" name="marketShortId" id="marketShortId" placeholder="Marketplace Short Id">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="shortId">Short Id</label>
+                            <input type="text" class="form-control" name="shortId" id="shortId" placeholder="Short Id">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="serviceName">Service Name</label>
+                            <input type="text" class="form-control" name="serviceName" id="serviceName" placeholder="Service Name">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="serviceDescription">Service Description</label>
+                            <input type="text" class="form-control" name="serviceDescription" id="serviceDescription" placeholder="Description">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group ">
+                            <label>Service Photo</label>
+                            <div class="upload_form"></div>
+                            <div class="thumbnails"></div>
+                            <div class="progress_bar"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="checkbox">
+                            <label><input name="active" type="checkbox">Active</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

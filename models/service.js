@@ -7,7 +7,8 @@ var serviceSchema = new Schema({
   serviceDescription:String,
   servicePhoto:String,
   active: Boolean,
-  new: Boolean
+  new: Boolean,
+  marketplace:{type: mongoose.Schema.ObjectId, ref: 'Marketplace' },
 });
 
 var Service = mongoose.model('Service', serviceSchema);

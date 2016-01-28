@@ -3,9 +3,10 @@ var bodyParser = require('body-parser')
 var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
+var path = require('path')
 var app = express();
 
-app.use(express.static('public_html'));
+
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -14,6 +15,15 @@ app.use(bodyParser.urlencoded({
 
 //JWT Middleware
 app.set('superSecret', config.secret); 
+
+var swig  = require('swig');
+app.engine('html', swig.renderFile);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+app.set('view cache', false);
+swig.setDefaults({ cache: false });
+
+app.use(express.static(path.join(__dirname, 'public_html')));
 
 app.use('/api/stripe',function(req, res, next) {
   // check header or url parameters or post parameters for token
@@ -72,6 +82,8 @@ var twilioRoutes = require('./routes/twilio-routes.js')(app);
 var postcodeRoutes = require('./routes/postcode-routes.js')(app);
 var stripeRoutes = require('./routes/stripe-routes.js')(app);
 var ratingsRoutes = require('./routes/ratings-routes.js')(app,log);
+var ratingsRoutes = require('./routes/market-routes.js')(app);
+var ratingsRoutes = require('./routes/pf-routes.js')(app);
 
 
 app.get('/api', function(req, res) {
