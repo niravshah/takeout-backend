@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col col-md-4">
                 <div class="dropdown">
-                    <form action="/pf/providers/market" method="get">
+                    <form action="/now/providers/market" method="get">
                         <select id="market">
                             {% for market in markets %}
                             <option value="{{market.shortId}}">{{market.shortId}} - {{ market.name}} - {{ market.description}}</option>
@@ -37,54 +37,65 @@
     </div>
 
     <div class="row">
-        <div class="col col-md-6">
-            <form action="/pf/providers/available" method="post">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="serviceName">Latitude</label>
-                            <input type="text" class="form-control" name="latitude" id="latitude" placeholder="Service Name">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="serviceName">Longitude</label>
-                            <input type="text" class="form-control" name="longitude" id="longitude" placeholder="Service Name">
-                        </div>
-                    </div>
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse1">Add New</a>
+                        </h4>
                 </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="serviceName">ServiceId</label>
-                            <input type="text" class="form-control" name="serviceId" id="serviceId" placeholder="Service Name">
+            </div>
+            <div id="collapse1" class="panel-collapse collapse" style="padding:40px;">
+
+                <div class="col col-md-6">
+                    <form action="/pf/providers/available" method="post">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="serviceName">Latitude</label>
+                                    <input type="text" class="form-control" name="latitude" id="latitude" placeholder="Service Name">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="serviceName">Longitude</label>
+                                    <input type="text" class="form-control" name="longitude" id="longitude" placeholder="Service Name">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="shortId">Short Id</label>
-                            <input type="text" class="form-control" name="shortId" id="shortId" placeholder="Short Id">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="serviceName">ServiceId</label>
+                                    <input type="text" class="form-control" name="serviceId" id="serviceId" placeholder="Service Name">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="shortId">Short Id</label>
+                                    <input type="text" class="form-control" name="shortId" id="shortId" placeholder="Short Id">
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary">Go Online</button>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-primary">Go Online</button>
-            </form>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %} {% block customscript %}
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#serviceId').val($('#service').val());
-        $('#latitude').val(geoplugin_latitude());
-        $('#longitude').val(geoplugin_longitude());
-        $('#service').on('change', function() {
-            $('#serviceId').val(this.value);
+    {% endblock %} {% block customscript %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#serviceId').val($('#service').val());
+            $('#latitude').val(geoplugin_latitude());
+            $('#longitude').val(geoplugin_longitude());
+            $('#service').on('change', function() {
+                $('#serviceId').val(this.value);
+            });
+            $('#market').on('change', function() {
+                $(this.form).attr("action", '/now/providers/' + this.value);
+            });
         });
-        $('#market').on('change', function() {
-            $(this.form).attr("action", '/pf/providers/' + this.value);
-        });
-    });
-</script>
-{% endblock %}
+    </script>
+    {% endblock %}
 

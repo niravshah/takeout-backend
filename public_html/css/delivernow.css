@@ -1,0 +1,224 @@
+/*
+    Document   : public_html/css/delivernow.css
+    Created on : 2016-01-31 12:18 AM
+    Author     : niravshah
+    Description:
+    Purpose of the stylesheet follows.
+    To change this template use Tools | Templates.
+*/
+
+body {
+  position: relative;
+}
+ .navbar-dn {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius:0px;
+    margin-bottom:0px;
+    position:fixed;
+    top:0;
+    left:0;
+    min-height:50px;
+    z-index:99;
+    width:100%;
+}
+.logo-dn {
+    height:46px;
+    width:46px;
+}
+.logo-txt-dn {
+    font-family:'Oswald', sans-serif;
+    font-size:26px;
+    color:#FFFFFF;
+    vertical-align:middle;
+}
+.slide-message {
+    background-color: rgba(0, 0, 0, 0.6);
+    width:600px;
+    height:400px;
+    position:fixed;
+    right:50px;
+    top:150px;
+    text-align:center;
+}
+.slide-message-left {
+    background-color: rgba(0, 0, 0, 0.6);
+    width:600px;
+    height:400px;
+    position:fixed;
+    left:50px;
+    top:150px;
+}
+.btn-cta-dn {
+    background-color:#FFC107;
+    color:#000000;
+    position:relative;
+    bottom:-350px;
+    width:100px;
+    text-align:center;
+    font-family:'Oswald', sans-serif;
+    font-size:14px;
+}
+
+.demo-container-dn{
+    width:100%;
+    height:600px;
+    background:#000000;
+}
+
+.footer-dn{
+    padding-top:20px;
+    background-color:#212121;
+    text-align:center;
+    color:#FFFFFF;
+    font-size:14px;
+    vertical-align:middle;
+    height:100px;
+}
+
+.video-container-dn{
+    padding-top:20px;
+}
+
+.video-dn{
+    margin:0 auto;
+}
+
+.video-title-dn{
+    padding-top:20px;
+    text-align:center;
+    color:#FFFFFF;
+}
+
+.features-dn{
+    padding:40px 10px;
+    background-color:#212121;
+    text-align:center;
+    color:#FFFFFF;
+    font-size:14px;
+    vertical-align:middle;
+    height:200px;
+}
+
+a{
+    color:#FFC107
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover, .nav-pills>li>a:focus, .nav-pills>li>a:hover{
+    background-color: transparent;
+    color:#FFFFFF;
+}
+
+.navbar-right{
+    padding-right:10px;
+}
+.navbar-right>li {
+    float:right;
+}
+
+.service-box>i{
+    font-size:24px;
+}
+.service-box>h3{
+     font-family:'Oswald', sans-serif;
+    font-size:18px;
+     color:#FFC107
+}
+
+.modal-dialog{
+    top: 150px;
+    width:600px;
+    height:300px;
+    background:rgba(0, 0, 0, 0.8);
+    border: 5px solid #FFC107;
+}
+
+.modal-content{
+    background:transparent;
+}
+
+button.close>span {
+    color:#FFFFFF
+}
+
+.modal-title{
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+    color:#FFFFFF
+}
+.modal-footer{
+    text-align:center;    
+}
+
+.modal-header, .modal-body,.modal-footer{
+    border:none;
+}
+
+.modal-btn-cta-dn {
+    background-color:#FFC107;
+    color:#000000;
+    width:100px;
+    text-align:center;
+    font-family:'Oswald', sans-serif;
+    font-size:14px;
+}
+
+.section-heading{
+    font-family: 'Open Sans', sans-serif;
+    font-size: 22px;
+    color:#FFC107;
+}
+
+.input-desc{
+    color:#FFFFFF;
+}
+
+
+/*demo html styles*/
+
+.demo-home{
+    background-image: url("/img/7-01-Comp.jpg");
+    background-size:cover;
+    width:100%;
+    height:650px;
+}
+
+.nav-bg{
+    background:#000000;
+    width:100%;
+    height:50px;
+}
+
+.demo-home .video-container-dn{
+     padding-top:40px;
+}
+
+.features-walkthrough{
+    padding:40px 10px;
+    background-color:#212121;
+    text-align:center;
+    color:#FFFFFF;
+    font-size:14px;
+    vertical-align:middle;
+    height:650px;
+}
+
+
+.now-platform{
+    padding:40px 10px;
+    background-color:#000000;
+    text-align:center;
+    color:#FFFFFF;
+    font-size:14px;
+    vertical-align:middle;
+    height:650px;
+}
+
+.now-logo{
+    background-image: url("/img/now_platform_logo_sm.png");
+    background-repeat:no-repeat;
+    width:314px;
+    height:137px;
+    top:250px;
+    position:relative;
+    background-color:rgba(255, 255, 255, 0.5);
+    left:100px;
+}
